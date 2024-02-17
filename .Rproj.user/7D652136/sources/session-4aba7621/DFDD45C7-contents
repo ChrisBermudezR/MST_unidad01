@@ -1,0 +1,200 @@
+---
+title: "Análisis del Mercado Inmobiliario en Cali"
+subtitle: |
+  | Pontificia Universidad Javeriana
+  | Maestría en Ciencia de Datos
+  | Métodos y Simulación  Estadísticos - A
+author: "Christian Bermúdez Rivas"
+date: "2024-02-19"
+bibliography: Bibliografia.bib  
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: 
+        collapsed: true
+        smooth_scroll: false
+    number_sections: true
+    theme: default
+   # code_folding: hide
+---
+
+# Introducción
+
+El sector inmobiliario, según informes del banco HSBC y el Foro Europeo del mercado inmobiliario, representa una parte significativa de la riqueza mundial. Con la cuarta revolución industrial y el avance de tecnologías como *PropTech*  (*prop* (propiedad) y  *tech* (tecnología)), se prevé una transformación radical en este sector, donde la fusión de comunicaciones y tecnología borra las fronteras entre lo físico y lo digital [@gonzalez2019]. Tecnologías como inteligencia artificial y Big Data están siendo aplicadas con éxito en operaciones financieras complejas y segmentación de derechos inmobiliarios. En Colombia, la entrada de startups y tecnologías como *Marketplaces*, *Big Data* y *crowdfunding* están revolucionando el panorama de los negocios inmobiliarios, abriendo nuevas oportunidades y valor al mercado [@gonzalez2019].
+
+Los análisis de ofertas del mercado inmobiliario son relevantes para comprender las dinámicas de precios de terrenos y construcciones, así como para obtener una valoración integral de los inmuebles con mayor precisión [@metropolizaccaomercado]. Además, sirve como respuesta aproximada a solicitudes de revisión del valor predial, minimizando riesgos de liquidación inadecuada.
+
+
+
+# Objetivos
+
+Este informe tiene como objetivo el análisis del mercado inmobiliario en el área urbana de la ciudad de Cali.
+
+## Objetivo General
+
+Presentar un análisis de precios en las diferentes zonas de Cali.
+
+Presentar un análisis dde lso tipos de viviendas más ofertadas en la ciudad de Cali.
+
+Presentar un análisis de las características más relevantes de la oferta de vivienda en Cali.
+
+## Objetivos Específicos
+
+# Métodos {.tabset}
+
+## Área de Estudio
+
+El área de estudio se enfocó en la zonal urbana del municipio de Santiago de Cali, Valle del Cauca, Colombia. (Figura \@ref(fig:mapa)).
+
+```{r mapa,  echo=FALSE, message=FALSE, console=FALSE, fig.id=TRUE}
+require(leaflet)
+require(leaflet.extras)
+require(sf)
+
+Casco<-sf::read_sf("./sig/Cali_WGS84.gpkg", layer='Contorno')
+Comunas<-sf::read_sf("./sig/Cali_WGS84.gpkg", layer='Comunas')
+Barrios<-sf::read_sf("./sig/Cali_WGS84.gpkg", layer='Barrios')
+
+
+map <-leaflet::leaflet(height=700, width = 800)%>%
+  setView(lng = -76.5225, lat = 3.42, zoom = 11.5)%>%
+  addPolygons(data = Casco, group = "Casco Urbano", color = "darkgrey",stroke = 0.2, opacity = 1)%>%
+  addPolygons(data = Comunas, group = "Comunas", color = "grey",stroke = 0.2, opacity = 1)%>%
+  addPolygons(data = Barrios, group = "Barrios", color = "white",stroke = 0.2, opacity = 1)%>%
+  addProviderTiles(providers$CartoDB.Voyager)%>%
+  addFullscreenControl(position = "topleft", pseudoFullscreen = TRUE)%>%
+  addLayersControl(overlayGroups = c("Casco Urbano", "Comunas", "Barrios"),    options = layersControlOptions(collapsed = FALSE))%>%
+addScaleBar(position = c("topright", "bottomright", "bottomleft", "topleft"),options = scaleBarOptions(metric = TRUE,
+imperial = FALSE, updateWhenIdle = TRUE))%>%
+  addMapPane("ames_lines", zIndex = 430) 
+ 
+ map
+ 
+ 
+
+```
+
+**Figura 1.** Mapa de la ciudad de Santiago de Cali.
+
+## Fuente de datos
+
+### Datos externos
+
+La capa geográfica de barrios y comunas fue descargada de la [*Infraestructura de Datos Espaciales de Cali*](http://ws-idesc.cali.gov.co:80/geoserver/idesc/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=idesc:mc_barrios&maxFeatures=400&outputFormat=SHAPE-ZIP).
+
+### Datos proporcionados
+
+Las fuentes de datos para este análisis provienen del paquete "paqueteMETODOS" del repositorio de *Github* <https://github.com/dgonxalex80/paqueteMODELOS>.
+
+Este conjunto de datos comprende 13 atributos y 8330 entradas, que caracterizan los precios, los tipos de vivienda, el número de habitaciones, el estrato, el número de parqueaderos, el número de baños y el área construida de lo disponible en el mercado inmobiliario de la ciudad de Cali.
+
+**Tabla 1 .** Conjunto de datos utilizado en este trabajo.
+
+```{r histgrama, echo=FALSE, message=FALSE, console=FALSE}
+library(paqueteMETODOS)
+library(reactable)
+
+data("vivienda_faltantes")
+
+reactable(vivienda_faltantes)
+
+```
+
+## Análisis de datos
+
+Todos los análisis y limpieza de datos se realizaron con el lenguaje de programación R [@Rteam]. Para la limpieza y organización de datos se utilizó el paquete "dplyr" [@dplyr].
+
+# Resultados {.tabset}
+
+## Análisis de Precios
+
+La distribución de los precios de la vivienda presenta un sesgo hacia valores muy altos (Figura \@ref(fig:figura2))
+
+```{r figura2, echo=FALSE, fig.align='center', fig.dpi=100, fig.id=TRUE}
+
+library(paqueteMETODOS)
+
+data("vivienda_faltantes")
+
+mxLo<-matrix(c(1,2), nrow=2, ncol=1, byrow=TRUE)
+nf<-layout(mat=mxLo, widths = c(3,3), heights = c(1,3), respect=TRUE)
+par(mar=c(0,3,1,1))
+boxplot(vivienda_faltantes$preciom,horizontal=TRUE, axes=FALSE, frame.plot=FALSE, col='white', border = '#367BB5', main=NULL)
+par(mar=c(4,4,2,2))
+hist(vivienda_faltantes$preciom , breaks = 30, col = '#367BB5', border = 'white', ylab="Frecuencia",xlab="Precios (millones)", main=NULL)
+
+
+```
+
+```{r Zonas, echo=FALSE, fig.align='center', fig.width=4, fig.height=8, fig.dpi=100, fig.id=TRUE}
+require(ggplot2)
+require(paqueteMETODOS)
+
+data("vivienda_faltantes")
+
+ggplot(na.omit(vivienda_faltantes), aes(x = preciom))+
+  geom_histogram(binwidth = 50,color= "white", fill = "#367BB5")+
+   facet_wrap(~zona, ncol = 1, scales = "free")+
+  labs(title = "Histograma de precio por zona")+
+  theme_classic()+
+  ylab("Frecuencia")+
+  xlab("Precios (millones)")+
+  theme(strip.text = element_text(face = "italic", color = "grey", hjust = 0, size = 11),
+        strip.background = element_rect(fill = "white", linetype = "solid",
+                                        color = "white", linewidth = 1))
+
+
+```
+
+
+
+
+
+## Tipos de viviendas ofertadas
+
+agfsfgfd
+
+## Características de las viviendas
+
+
+# Discusión
+
+# Conclusiones
+
+# Referencias
+
+::: {#refs}
+:::
+
+# Anexos
+
+Mapa de distribución de precios. Las coordenadas están mal asignadas.
+
+
+```{r mapa_precios_general, fig.align='center',echo=FALSE, message=FALSE, console=FALSE}
+require(leaflet)
+require(leaflet.extras)
+require(sf)
+datos_Vivienda<-read.csv2("datos_Vivienda.csv")
+Cali_WGS84<-sf::read_sf("./sig/Cali_WGS84.gpkg", layer="Barrios")
+
+datos_Vivienda_sin.na<- subset(datos_Vivienda, !is.na(Longitud) & !is.na(Latitud))
+Viviendas_Espacial <- sf::st_as_sf(datos_Vivienda_sin.na, coords = c("Longitud", "Latitud"))
+crs <- sf::st_crs("+proj=longlat +datum=WGS84 +no_defs")
+Viviendas_Espacial <- sf::st_set_crs(Viviendas_Espacial, crs)
+joined_sf <- sf::st_join(Viviendas_Espacial,Cali_WGS84 , join = st_within)
+pal <- colorNumeric(
+  palette = "YlOrRd",
+  domain = na.omit(datos_Vivienda$Precio))
+
+map<-leaflet::leaflet(height=700, width = 800)%>%
+ addProviderTiles(providers$CartoDB.DarkMatterNoLabels)%>%
+  addCircles(data = joined_sf, color = ~pal(Precio),  radius = ~Precio/10)%>%
+  addFullscreenControl(position = "topleft", pseudoFullscreen = TRUE)%>%
+  addLegend( position = "bottomleft", pal = pal, values = na.omit(datos_Vivienda$Precio),
+            title = 'Precios',
+            opacity = 1)%>%
+   addMiniMap(tiles = "CartoDB.Voyager")
+map
+```

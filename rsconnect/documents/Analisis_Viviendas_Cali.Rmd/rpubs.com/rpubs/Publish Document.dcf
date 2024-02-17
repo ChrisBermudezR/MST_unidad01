@@ -1,0 +1,10 @@
+name: Publish Document
+title:
+username:
+account: rpubs
+server: rpubs.com
+hostUrl: rpubs.com
+appId: https://api.rpubs.com/api/v1/document/1148969/c8b557d3e4bf4c2086e01dc0bacde8aa
+bundleId: https://api.rpubs.com/api/v1/document/1148969/c8b557d3e4bf4c2086e01dc0bacde8aa
+url: http://rpubs.com/ChrisBermudezR/1148969
+version: 1

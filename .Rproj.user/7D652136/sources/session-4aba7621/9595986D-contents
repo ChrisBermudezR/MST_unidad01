@@ -1,0 +1,541 @@
+# Métodos y Simulación Estadística
+# Unidad 01
+# Ejercicios
+
+
+#Notas. se debe actualizar el Rtools.
+
+install.packages("learnr")          # solo una vez
+install.packages("devtools")      # solo una vez
+
+
+devtools::install_github("dgonxalex80/paqueteMETODOS") #descarga paquete paqueteMETODOS
+learnr::run_tutorial("Tutorial101", "paqueteMETODOS")  # carga Tutorial101
+learnr::run_tutorial("Tutorial102", "paqueteMETODOS")  # carga Tutorial102
+learnr::run_tutorial("Tutorial103", "paqueteMETODOS")  # carga Tutorial103
+
+require(paqueteMETODOS)
+require(dplyr)
+require(stringi)
+require(sf)
+
+data("vivienda_faltantes")
+View(vivienda_faltantes)
+
+colnames(vivienda_faltantes)
+
+datos_Vivienda<-vivienda_faltantes
+dim(datos_Vivienda)
+colnames(datos_Vivienda)<-c("id", 
+                            "Zona",
+                            "No.Pisos", 
+                            "Estrato", 
+                            "Precio",   
+                            "Area_Construida", 
+                            "No.Parqueaderos",   
+                            "No.Baños",    
+                            "No.Habitaciones",   
+                            "Tipo.Vivienda",      
+                            "Barrio",    
+                            "Longitud",  
+                            "Latitud" 
+                            )
+View(datos_Vivienda)
+
+class(datos_Vivienda$id)
+class(datos_Vivienda$Zona)
+class(datos_Vivienda$No.Pisos)
+class(datos_Vivienda$Estrato)
+class(datos_Vivienda$Precio)
+class(datos_Vivienda$Area_Construida)
+class(datos_Vivienda$No.Parqueaderos)
+class(datos_Vivienda$No.Baños)
+class(datos_Vivienda$No.Habitaciones)
+class(datos_Vivienda$Tipo.Vivienda)
+class(datos_Vivienda$Barrio)
+class(datos_Vivienda$Longitud)
+class(datos_Vivienda$Latitud)
+
+
+
+
+
+datos_Vivienda$Zona<-as.factor(datos_Vivienda$Zona)
+datos_Vivienda$No.Pisos<-as.factor(datos_Vivienda$No.Pisos)
+datos_Vivienda$Estrato<-as.factor(datos_Vivienda$Estrato)
+datos_Vivienda$No.Parqueaderos<-as.factor(datos_Vivienda$No.Parqueaderos)
+datos_Vivienda$No.Baños<-as.factor(datos_Vivienda$No.Baños)
+datos_Vivienda$No.Habitaciones<-as.factor(datos_Vivienda$No.Habitaciones)
+datos_Vivienda$Tipo.Vivienda<-as.factor(datos_Vivienda$Tipo.Vivienda)
+as.factor(datos_Vivienda$Barrio)
+
+#Corrección de la Longitud####
+
+for(i in 1:length(datos_Vivienda$Longitud)){
+  if(is.na(datos_Vivienda$Longitud[i]) == "FALSE"){
+    if(datos_Vivienda$Longitud[i]<(-100)){
+      datos_Vivienda$Longitud[i] = datos_Vivienda$Longitud[i]/1000
+    }
+  }
+}
+
+for(i in 1:length(datos_Vivienda$Latitud)){
+  if(is.na(datos_Vivienda$Latitud[i]) == "FALSE"){
+    if(datos_Vivienda$Latitud[i]>10){
+      datos_Vivienda$Latitud[i] = datos_Vivienda$Latitud[i]/1000
+    }
+  }
+}
+      
+#Corrección de tipo de vivienda####           
+
+
+datos_Vivienda$Tipo.Vivienda<-dplyr::recode_factor(datos_Vivienda$Tipo.Vivienda,
+                                             "APARTAMENTO" = "Apartamento",
+                                             "apto" = "Apartamento", 
+                                             "casa" = "Casa",
+                                             "CASA" = "Casa")
+
+Cali_WGS84<-sf::st_read("./sig/Cali_WGS84.gpkg", layer="Barrios")
+
+
+Cali_WGS84$Zonas_IDE<-dplyr::recode_factor(Cali_WGS84$comuna,
+                                           "01" = "Zona Oeste",
+                                           "02" = "Zona Oeste",
+                                           "03" = "Zona Centro",
+                                           "04" = "Zona Norte",
+                                           "05" = "Zona Norte",
+                                           "06" = "Zona Norte",
+                                           "07" = "Zona Norte",
+                                           "08" = "Zona Norte",
+                                           "09" = "Zona Centro",
+                                           "10" = "Zona Sur",
+                                           "11" = "Zona Oriente",
+                                           "12" = "Zona Oriente",
+                                           "13" = "Zona Oriente",
+                                           "14" = "Zona Oriente",
+                                           "15" = "Zona Oriente",
+                                           "16" = "Zona Oriente",
+                                           "17" = "Zona Sur",
+                                           "18" = "Zona Sur",
+                                           "19" = "Zona Sur",
+                                           "20" = "Zona Sur",
+                                           "21" = "Zona Oriente",
+                                           "22" = "Zona Sur")
+                                           
+
+
+
+datos_Vivienda$Barrio<-toupper(stringi::stri_trans_general(datos_Vivienda$Barrio,"Latin-ASCII"))
+levels(as.factor(datos_Vivienda$Barrio))
+
+lista_Barrios<-vector("list", length = 2)
+
+lista_Barrios[[1]]<-as.list(levels(as.factor(datos_Vivienda$Barrio)))
+lista_Barrios[[2]]<-as.list(levels(as.factor(Cali_WGS84$barrio)))
+names(lista_Barrios) <- c('Originales','IDE')
+
+intersect(lista_Barrios[[1]], lista_Barrios[[2]])
+setdiff(lista_Barrios[[1]], lista_Barrios[[2]])
+
+lista_Barrios[[3]]<-as.list(toupper(stringi::stri_trans_general(lista_Barrios[[1]],"Latin-ASCII")))
+lista_Barrios[[4]]<-as.list(toupper(stringi::stri_trans_general(lista_Barrios[[2]],"Latin-ASCII")))
+names(lista_Barrios) <- c('Originales','IDE', 'ORG_homo', 'IDE_homo')
+
+
+intersect(lista_Barrios[[3]], lista_Barrios[[4]])
+setdiff(lista_Barrios[[3]], lista_Barrios[[4]])
+
+
+
+datos_Vivienda$Barrio_Clean<-dplyr::recode_factor(datos_Vivienda$Barrio,
+                                                   "ACOPI" = "BRISAS DE LOS ALAMOS",
+                                                   "AGUA BLANCA" = "AGUABLANCA", 
+                                                   "ALAMOS" = "CIUDAD DE LOS ALAMOS",
+                                                   "ALBORADA" = "LA ALBORADA",
+                                                  "ALCAZARES" = "LOS ALCAZARES",
+                                                  "ALF√(C)REZ REAL" = "ALFEREZ REAL",
+                                                  "ALFONSO LOPEZ" = "ALFONSO LOPEZ P. 1A ETAPA",
+                                                  "ALFONSO LOPEZ I" = "ALFONSO LOPEZ P. 1A ETAPA",
+                                                  "ALTO JORDAN" = "SECTOR ALTO JORDAN",
+                                                  "ALTOS DE GUADALUPE" = "SECTOR CANAVERALEJO GUADALUPE",
+                                                  "ALTOS DE SANTA" = "SECTOR ALTOS DE SANTA ISABEL",
+                                                  "ALAMEDA DEL RIO" = "CIUDAD DE LOS ALAMOS",
+                                                  "ARBOLEDA" = "ARBOLEDAS",
+                                                  "ARBOLEDA CAMPESTRE CANDELARIA" = "NA",
+                                                  "AUTOPISTA SUR" = "NA",
+                                                  "BAJO AGUACATAL" = "AGUACATAL",
+                                                  "BARRANQUILLA" = "LOS PARQUES BARRANQUILLA",
+                                                  "BARRIO 7DE AGOSTO" = "SIETE DE AGOSTO",
+                                                  "BARRIO EL RECUERDO" = "EL RECUERDO",
+                                                  "BARRIO EUCARISTICO" = "EUCARISTICO",
+                                                  "BARRIO TRANQUILO Y" = "NA",
+                                                  "BASE A√(C)REA" = "BASE AEREA",
+                                                  "BELLA SUIZA" = "CANAVERAL",
+                                                  "BELLA SUIZA ALTA" = "CANAVERAL",
+                                                  "BERLIN" = "SULTANA - BERLIN - SAN FRANCISCO",
+                                                  "BLOQUES DEL LIMONAR" = "EL LIMONAR",
+                                                  "BOCHALEMA" = "BOCHALEMA",
+                                                  "CIUDAD BOCHALEMA" = "BOCHALEMA",
+                                                  "BOSQUES DE ALBOLEDA" = "SANTA TERESITA",
+                                                  "BOYACA" = "URBANIZACION BOYACA",
+                                                  "BRISAS DE GUADALUPE" = "SECTOR CANAVERALEJO GUADALUPE",
+                                                  "BRISAS DE LOS" = "BRISAS DE LOS ALAMOS",
+                                                  "BRISAS DEL GUABITO" = "VILLA DEL PRADO - EL GUABITO",
+                                                  "BUENO MADRID" = "UNIDAD RESIDENCIAL BUENO MADRID",
+                                                  "CALI" = "NA",
+                                                  "CALI BELLA" = "FEPICOL",
+                                                  "CALI CANTO" = "LILI",
+                                                  "CALIBELLA" = "FEPICOL",
+                                                  "CALICANTO" = "LILI",
+                                                  "CALICANTO VIII" = "LILI",
+                                                  "CALIMIO NORTE" = "URBANIZACION CALIMIO",
+                                                  "CAMBULOS" = "LOS CAMBULOS",
+                                                  "CAMINO REAL" = "CAMINO REAL - LOS FUNDADORES",
+                                                  "CAMPESTRE" = "CLUB CAMPESTRE",
+                                                  "CANEY ESPECIAL" = "CANEY",
+                                                  "CANASGORDAS" = "URBANIZACION RIO LILI",
+                                                  "CANAVERALEJO" = "CANAVERALEJO - SEGUROS COLPATRIA",
+                                                  "CANAVERALES" = "CANAVERALES - LOS SAMANES",
+                                                  "CANAVERALES LOS SAMANES" = "CANAVERALES - LOS SAMANES",
+                                                  "CAPRI" = "CIUDAD CAPRI",
+                                                  "CASCAJAL" = "NA",
+                                                  "CATAYA REAL" = "PARCELACIONES PANCE",
+                                                  "CEIBAS" = "LAS CEIBAS",
+                                                  "CENTELSA" = "MENGA",
+                                                  "CENTRO" = "NA",
+                                                  "CERRO CRISTALES" = "SECTOR ALTOS DE SANTA ISABEL",
+                                                  "CERROS DE GUADALUPE" = "SECTOR CANAVERALEJO GUADALUPE",
+                                                  "CHIMINANGOS" = "CHIMINANGOS I",
+                                                  "CHIMINANGOS 1 ETAPA" = "CHIMINANGOS I",
+                                                  "CHIMINANGOS 2 ETAPA" = "CHIMINANGOS II",
+                                                  "CIUDAD ANTEJARDIN" = "URBANIZACION CIUDAD JARDIN",
+                                                  "CIUDAD CORDOBA RESERVADO" = "CIUDAD CORDOBA",
+                                                  "CIUDAD COUNTRY" = "NA",
+                                                  "CIUDAD DEL CAMPO" = "NA",
+                                                  "CIUDAD JARDIN" = "URBANIZACION CIUDAD JARDIN",
+                                                  "CIUDAD JARDIN PANCE" = "PARCELACIONES PANCE",
+                                                  "CIUDAD LOS ALAMOS" = "CIUDAD DE LOS ALAMOS",
+                                                  "CIUDAD MEL√(C)NDEZ" = "MELENDEZ",
+                                                  "CIUDAD MELENDEZ" = "MELENDEZ",
+                                                  "CIUDAD MODELO" = "LOS SAUCES",
+                                                  "CIUDAD PACIFICA" = "NA",
+                                                  "CIUDAD REAL" = "NA",
+                                                  "CIUDADELA DEL RIO" = "CIUDADELA DEL RIO - CVC",
+                                                  "CIUDADELA MELENDEZ" = "SECTOR MELENDEZ",
+                                                  "CIUDADELA PASO ANCHO" = "CIUDADELA PASOANCHO",
+                                                  "COLINAS DE MENGA" = "ALTOS DE MENGA",
+                                                  "COLINAS DEL BOSQUE" = "EL BOSQUE",
+                                                  "COLON" = "CRISTOBAL COLON",
+                                                  "COLSEGUROS" = "COLSEGUROS ANDES",
+                                                  "COMFENALCO" = "PASO DEL COMERCIO",
+                                                  "CONJUNTO GIBRALTAR" = "EL TRONCAL",
+                                                  "CRISTALES" = "TEJARES - CRISTALES",
+                                                  "CUARTO DE LEGUA" = "CUARTO DE LEGUA - GUADALUPE",
+                                                  "ED BENJAMIN HERRERA" = "SAN PEDRO",
+                                                  "EL CANEY" = "CANEY",
+                                                  "EL CASTILLO" = "PANAMERICANO",
+                                                  "EL GUABITO" = "VILLA DEL PRADO - EL GUABITO",
+                                                  "EL INGENIO 3" = "EL INGENIO",
+                                                  "EL INGENIO I" = "EL INGENIO",
+                                                  "EL INGENIO II" = "EL INGENIO",
+                                                  "EL INGENIO III" = "EL INGENIO",
+                                                  "EL TR√(C)BOL" = "EL TREBOL",
+                                                  "FARRALLONES DE PANCE" = "PARCELACIONES PANCE",
+                                                  "FLORA" = "LA FLORA",
+                                                  "FLORALIA" = "CIUDADELA FLORALIA",
+                                                  "FUENTES DE LA" = "NA",
+                                                  "GAITAN" = "JORGE ELIECER GAITAN",
+                                                  "GRAN LIMONAR" = "EL GRAN LIMONAR",
+                                                  "GUADALUPE" = "CUARTO DE LEGUA - GUADALUPE",
+                                                  "GUADALUPE ALTO" = "SECTOR CANAVERALEJO GUADALUPE",
+                                                  "GUADUALES" = "LOS GUADUALES",
+                                                  "HACIENDA ALFEREZ REAL" = "ALFEREZ REAL",
+                                                  "INGENIO" = "EL INGENIO",
+                                                  "INGENIO I" = "EL INGENIO",
+                                                  "INGENIO II" = "EL INGENIO",
+                                                  "JAMUNDI" = "NA",
+                                                  "JAMUNDI ALFAGUARA" = "NA",
+                                                  "JOSE MANUEL MARROQUIN" = "JOSE MANUEL MARROQUIN I",
+                                                  "JUANAMB√∫" = "JUANAMBU",
+                                                  "LA ARBOLEDA" = "ARBOLEDAS",
+                                                  "LA BUITRERA" = "NA",
+                                                  "LA CEIBAS" = "LAS CEIBAS",
+                                                  "LA LUISA" = "SECTOR ALTO LOS CHORROS",
+                                                  "LA MORADA" = "NA",
+                                                  "LA NUEVA BASE" = "URBANIZACION LA NUEVA BASE",
+                                                  "LA PORTADA AL" = "SANTA TERESITA",
+                                                  "LA PRIMAVERA" = "PRIMAVERA",
+                                                  "LA REFORMA" = "NA",
+                                                  "LA RIVERA" = "LA RIVERA I",
+                                                  "LA RIVERA II" = "LA RIVERA I",
+                                                  "LA RIVERITA" = "PARCELACIONES PANCE",
+                                                  "LA RIVIERA" = "LOS ANDES B - LA RIVIERA",
+                                                  "LA VILLA DEL" = "NA",
+                                                  "LAFLORA" = "LA FLORA",
+                                                  "LARES DE COMFENALCO" = "SECTOR PUENTE DEL COMERCIO",
+                                                  "LAS AM√(C)RICAS" = "LAS AMERICAS",
+                                                  "LAS CAMELIAS" = "CANAVERALES - LOS SAMANES",
+                                                  "LAS QUINTAS DE" = "LAS QUINTAS DE DON SIMON",
+                                                  "LAS VEGAS" = "MAYAPAN - LAS VEGAS",
+                                                  "LAS VEGAS DE" = "EL CANEY",
+                                                  "LIBERTADORES" = "LOS LIBERTADORES",
+                                                  "LOS ALAMOS" = "CIUDAD LOS ALAMOS",
+                                                  "LOS CRISTALES" = "TEJARES - CRISTALES",
+                                                  "LOS CRISTALES CLUB" = "ALTOS DE SANTA ISABEL",
+                                                  "LOS JOCKEYS" = "URBANIZACION CIUDAD JARDIN",
+                                                  "MAMELLAN" = "BELLAVISTA",
+                                                  "MAYAPAN LAS VEGAS" = "MAYAPAN - LAS VEGAS",
+                                                  "MEL√(C)NDEZ" = "MELENDEZ",
+                                                  "MIRADOL DEL AGUACATAL" = "AGUACATAL",
+                                                  "MORICHAL DE COMFANDI" = "SECTOR ALTO JORDAN",
+                                                  "MULTICENTRO" = "UNICENTRO CALI",
+                                                  "NORMANDIA WEST POINT" = "NORMANDIA",
+                                                  "NORTE" = "PRADOS DEL NORTE",
+                                                  "NORTE LA FLORA" = "LA FLORA",
+                                                  "NUEVA BASE" = "URBANIZACION NUEVA BASE",
+                                                  "OASIS DE COMFANDI" = "LOS GUADUALES",
+                                                  "OASIS DE PASOANCHO" = "COLSEGUROS ANDES",
+                                                  "OCCIDENTE" = "NA",
+                                                  "PACARA" = "LA MERCED",
+                                                  "PALMAS DEL INGENIO" = "EL INGENIO",
+                                                  "PAMPALINDA" = "PAMPA LINDA",
+                                                  "PANCE" = "PARCELACIONES PANCE",
+                                                  "PARQUE RESIDENCIAL EL" = "EL BOSQUE",
+                                                  "POBLADO CAMPESTRE" = "NA",
+                                                  "PONCE" = "PARCELACIONES PANCE",
+                                                  "PORTADA DE COMFANDI" = "LOS ALCAZARES",
+                                                  "PORTALES DE COMFANDI" = "NA",
+                                                  "PUENTE DEL COMERCIO" = "SECTOR PUENTE DEL COMERCIO",
+                                                  "PUENTE PALMA" = "CUARTO DE LEGUA - GUADALUPE",
+                                                  "PASEO DE LOS" = "LOS PARQUES BARRANQUILLA",
+                                                  "QUINTAS DE DON" = "LAS QUINTAS DE DON SIMON",
+                                                  "QUINTAS DE SALOMIA" = "JORGE ELIECER GAITAN",
+                                                  "REFUGIO" = "EL REFUGIO",
+                                                  "REP√∫BLICA DE ISRAEL" = "REPUBLICA DE ISRAEL",
+                                                  "RINCON DE LA" = "UNIDAD RESIDENCIAL BUENO MADRID",
+                                                  "RINCON DE SALOMIA" = "SALOMIA",
+                                                  "RIVERAS DEL VALLE" = "EL CANEY",
+                                                  "ROZO LA TORRE" = "NA",
+                                                  "SAMANES" = "CANAVERALES - LOS SAMANES",
+                                                  "SAMANES DE GUADALUPE" = "CANAVERALES - LOS SAMANES",
+                                                  "SAMECO" = "URBANIZACION LA FLORA",
+                                                  "SAN BOSCO" = "SAN JUAN BOSCO",
+                                                  "SAN FERNANDO" = "SAN FERNANDO NUEVO",
+                                                  "SAN JOAQUIN" = "URBANIZACION SAN JOAQUIN",
+                                                  "SAN JUDAS" = "SAN JUDAS TADEO I",
+                                                  "SAN JUDAS TADEO" = "SAN JUDAS TADEO II",
+                                                  "SANTA" = "SANTA TERESITA",
+                                                  "SANTA ANITA" = "SANTA ANITA - LA SELVA",
+                                                  "SANTA ANITA SUR" = "SANTA ANITA - LA SELVA",
+                                                  "SANTA HELENA DE" = "SANTA ELENA",
+                                                  "SANTA MONICA ALTA" = "SANTA MONICA",
+                                                  "SANTA MONICA NORTE" = "SANTA MONICA",
+                                                  "SANTA MONICA RESIDENCIAL" = "SANTA MONICA",
+                                                  "SANTAFE" = "SANTA FE",
+                                                  "SECTOR AGUACATAL" = "AGUACATAL",
+                                                  "SEMINARIO" = "PAMPA LINDA",
+                                                  "SIERRAS DE NORMANDIA" = "NORMANDIA",
+                                                  "TEJARES CRISTALES" = "TEJARES - CRISTALES",
+                                                  "TEJARES DE SAN" = "MIRAFLORES",
+                                                  "TEMPLETE" = "EUCARISTICO",
+                                                  "TEQUENDAMA" = "URBANIZACION TEQUENDAMA",
+                                                  "TEQUENDEMA" = "NUEVA TEQUENDAMA",
+                                                  "UNION DE VIVIENDA" = "UNION DE VIVIENDA POPULAR",
+                                                  "URBANIZACION BARRANQUILLA" = "LOS PARQUES BARRANQUILLA",
+                                                  "URBANIZACION EL SAMAN" = "CANAVERALES - LOS SAMANES",
+                                                  "URBANIZACION GRATAMIRA" = "LA SELVA",
+                                                  "URBANIZACION LA NUEVA" = "NUEVA FLORESTA",
+                                                  "URBANIZACION LAS CASCADAS" = "CUARTO DE LEGUA - GUADALUPE",
+                                                  "URBANIZACION LILI" = "URBANIZACION RIO LILI",
+                                                  "URBANIZACION PACARA" = "CIUDAD LOS ALAMOS",
+                                                  "VALLE DE LILI" = "LILI",
+                                                  "VALLE DEL LILI" = "LILI",
+                                                  "VILLA DE VERACRUZ" = "SALOMIA",
+                                                  "VILLA DEL PARQUE" = "LOS PARQUES BARRANQUILLA",
+                                                  "VILLA DEL PRADO" = "VILLA DEL PRADO - EL GUABITO",
+                                                  "VILLAS DE VERACRUZ" = "SALOMIA",
+                                                  "ZONA CENTRO" = "NA",
+                                                  "ZONA NORTE" = "NA",
+                                                  "ZONA NORTE LOS" = "NA",
+                                                  "ZONA OESTE" = "NA",
+                                                  "ZONA ORIENTE" = "NA",
+                                                  "ZONA RESIDENCIAL" = "NA",
+                                                  "ZONA SUR" = "NA"
+)
+
+
+
+datos_Vivienda$Barrio_Clean<-as.factor(datos_Vivienda$Barrio_Clean)
+boxplot(datos_Vivienda$Precio ~ datos_Vivienda$Barrio_Clean)
+
+
+
+write.csv2(datos_Vivienda, "datos_Vivienda.csv")
+
+
+
+#####Espacial####
+
+Zonas<-sf::read_sf("./sig/Cali_WGS84.gpkg", layer='Zonas')
+Comunas<-sf::read_sf("./sig/Cali_WGS84.gpkg", layer='Comunas')
+Barrios<-sf::read_sf("./sig/Cali_WGS84.gpkg", layer='Barrios')
+
+require(leaflet)
+
+leaflet::leaflet()%>%
+  addTiles() %>%  # Agrega tiles de OpenStreetMap
+  # Agrega el objeto sf al mapa
+  addPolygons(data = Zonas)
+
+
+Cali_WGS84$Barrio_Clean<-toupper(stringi::stri_trans_general(Cali_WGS84$barrio,"Latin-ASCII"))
+
+#Convertir la tabla de viviendas en un objeto espacial
+
+datos_Vivienda_sin.na<- subset(datos_Vivienda, !is.na(Longitud) & !is.na(Latitud))
+Viviendas_Espacial <- sf::st_as_sf(datos_Vivienda_sin.na, coords = c("Longitud", "Latitud"))
+Viviendas_Espacial
+Viviendas_Espacial$Barrio_Clean<-as.factor(Viviendas_Espacial$Barrio_Clean)
+crs <- sf::st_crs("+proj=longlat +datum=WGS84 +no_defs")
+Viviendas_Espacial <- sf::st_set_crs(Viviendas_Espacial, crs)
+
+
+#Union de capas
+datos_join <- dplyr::left_join(Viviendas_Espacial, as.data.frame(df_sin_duplicados), by = "Barrio_Clean")
+zonas_join <- dplyr::left_join(df_sin_duplicados,as.data.frame(Viviendas_Espacial), by = "Barrio_Clean")
+
+
+
+
+summary(datos_join$Zonas_IDE)
+
+#Imputacion por datos originales
+for(i in 1:length(datos_join$Zonas_IDE)){
+if(is.na(datos_join$Zonas_IDE[i])== "TRUE"){
+  datos_join$Zonas_IDE[i] = datos_join$Zona[i]
+  }
+}
+
+summary(datos_join$Zonas_IDE)
+
+write.table(datos_join, "datos_limpios.csv", sep=",", col.names = TRUE)
+
+Barrios_precio<-datos_join%>%group_by(Barrio_Clean)%>%summarise(
+  media = mean(Precio),
+  mediana = median(Precio ),
+  IQR = IQR(Precio ),
+  Q1 =quantile(Precio, 0.25),
+  Q3 =quantile(Precio, 0.75),
+  VarCoef = sd(Precio) / mean(Precio),
+  sd = sd(Precio)
+)
+
+Comuna_precio<-datos_join%>%group_by(comuna)%>%summarise(
+  media = mean(Precio),
+  mediana = median(Precio ),
+  IQR = IQR(Precio ),
+  Q1 =quantile(Precio, 0.25),
+  Q3 =quantile(Precio, 0.75),
+  VarCoef = sd(Precio) / mean(Precio),
+  sd = sd(Precio)
+)
+
+Zona_precio<-datos_join%>%group_by(Zonas_IDE)%>%summarise(
+  media = mean(Precio),
+  mediana = median(Precio ),
+  IQR = IQR(Precio ),
+  Q1 =quantile(Precio, 0.25),
+  Q3 =quantile(Precio, 0.75),
+  VarCoef = sd(Precio) / mean(Precio),
+  sd = sd(Precio)
+)
+
+boxplot(Zona_precio$mediana)
+
+
+
+Barrios<-sf::read_sf("./sig/Cali_WGS84.gpkg", layer='Barrios')
+Barrios$Barrio_Clean<-toupper(stringi::stri_trans_general(Barrios$barrio,"Latin-ASCII"))
+
+Comunas<-sf::read_sf("./sig/Cali_WGS84.gpkg", layer='Comunas')
+Zonas<-sf::read_sf("./sig/Cali_WGS84.gpkg", layer='Zonas')
+Zonas$Zonas_IDE<-Zonas$Zona
+
+Barrios_precio_join <- dplyr::left_join(Barrios,as.data.frame(Barrios_precio), by = "Barrio_Clean")
+Barrios_precio_join<-Barrios_precio_join[,3:11]
+comuna_precio_join <- dplyr::left_join(Comunas,as.data.frame(Comuna_precio), by = "comuna")
+comuna_precio_join<-comuna_precio_join[,1:13]
+zonas_precio_join <- dplyr::left_join(Zonas,as.data.frame(Zona_precio), by = "Zonas_IDE")
+zonas_precio_join<-zonas_precio_join[,1:10]
+
+
+sf::st_write(Barrios_precio_join, dsn ="./sig/Barrios_Precio_Total.gpkg",   layer='Barrios_Precio_Total', driver ="GPKG", append=TRUE)
+sf::st_write(comuna_precio_join, dsn ="./sig/Comuna_Precio_Total.gpkg", layer='Comuna_Precio_Total',  driver ="GPKG", append=TRUE)
+sf::st_write(zonas_precio_join, dsn ="./sig/Zonas_Precio_Total.gpkg", layer='Zonas_Precio_Total',  driver ="GPKG", append=TRUE)
+
+barriosPaleta <- colorNumeric(
+  palette = "YlOrRd",
+  domain = na.omit(Barrios_precio_join$mediana))
+barriosPaletaIQR<- colorNumeric(
+  palette = "PuBuGn",
+  domain = na.omit(Barrios_precio_join$IQR))
+
+labelsMediana <- sprintf(
+  "<strong>%s</strong><br/>%g",
+  Barrios_precio_join$barrio , Barrios_precio_join$mediana
+) %>% lapply(htmltools::HTML)
+
+labelsIQR <- sprintf(
+  "<strong>%s</strong><br/>%g",
+  Barrios_precio_join$barrio , Barrios_precio_join$IQR
+) %>% lapply(htmltools::HTML)
+
+
+leaflet::leaflet(height=700, width = 800)%>%
+  addProviderTiles(providers$CartoDB.DarkMatterNoLabels)%>%
+  addPolygons(data = Barrios_precio_join, 
+              fillColor =  ~barriosPaleta(mediana),  weight = 2,
+              opacity = 1,
+              color = "grey",
+              dashArray = "3",
+              group = "Mediana",
+              fillOpacity = 1,
+              highlightOptions = highlightOptions(
+                weight = 5,
+                color = "#666",
+                dashArray = "",
+               bringToFront = TRUE),
+              label = labelsMediana,
+              labelOptions = labelOptions(
+                style = list("font-weight" = "normal", padding = "3px 8px"),
+                textsize = "15px",
+                direction = "auto"))%>%
+  addPolygons(data = Barrios_precio_join, 
+              fillColor =  ~barriosPaletaIQR(IQR),  weight = 2,
+              opacity = 1,
+              color = "grey",
+              dashArray = "3",
+              group = "IQR",
+              fillOpacity = 1,
+              highlightOptions = highlightOptions(
+                weight = 5,
+                color = "#666",
+                dashArray = "",
+                bringToFront = TRUE),
+              label = labelsIQR,
+              labelOptions = labelOptions(
+                style = list("font-weight" = "normal", padding = "3px 8px"),
+                textsize = "15px",
+                direction = "auto"))%>%
+  addFullscreenControl(position = "topleft", pseudoFullscreen = TRUE)%>%
+  addLegend( position = "bottomleft", pal = barriosPaleta, values = na.omit(Barrios_precio_join$mediana),
+             title = 'Precios',
+             opacity = 1)%>%
+  addLegend( position = "bottomleft", pal = barriosPaletaIQR, values = na.omit(Barrios_precio_join$IQR),
+             title = 'Precios',
+             opacity = 1)%>%
+  addLayersControl(overlayGroups = c("Mediana", "IQR"),    options = layersControlOptions(collapsed = FALSE))%>%
+  addMiniMap(tiles = "CartoDB.Voyager")
+
+
