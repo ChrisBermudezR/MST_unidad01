@@ -416,8 +416,8 @@ Viviendas_Espacial <- sf::st_set_crs(Viviendas_Espacial, crs)
 
 
 #Union de capas
-datos_join <- dplyr::left_join(Viviendas_Espacial, as.data.frame(df_sin_duplicados), by = "Barrio_Clean")
-zonas_join <- dplyr::left_join(df_sin_duplicados,as.data.frame(Viviendas_Espacial), by = "Barrio_Clean")
+datos_join <- dplyr::left_join(Viviendas_Espacial, as.data.frame(Cali_WGS84), by = "Barrio_Clean")
+zonas_join <- dplyr::left_join(Cali_WGS84,as.data.frame(Viviendas_Espacial), by = "Barrio_Clean")
 
 
 
@@ -755,3 +755,176 @@ barplot(summary(Apartamento_Estrato04_Imp$No.Parqueaderos), main = "No.Parqueade
 barplot(summary(Apartamento_Estrato05_Imp$No.Parqueaderos), main = "No.Parqueaderos Apartamentos de estrato 5", xlab = "Pisos", ylab="Frecuencia", col="#367BB5", border = 'white', bg="#FFFFFF")
 barplot(summary(Apartamento_Estrato06_Imp$No.Parqueaderos), main = "No.Parqueaderos Apartamentos de estrato 6", xlab = "Pisos", ylab="Frecuencia", col="#367BB5", border = 'white', bg="#FFFFFF")
 dev.off()
+
+
+
+#####Espacial####
+
+Zonas<-sf::read_sf("./sig/Cali_WGS84.gpkg", layer='Zonas')
+Comunas<-sf::read_sf("./sig/Cali_WGS84.gpkg", layer='Comunas')
+Barrios<-sf::read_sf("./sig/Cali_WGS84.gpkg", layer='Barrios')
+
+require(leaflet)
+
+leaflet::leaflet()%>%
+  addTiles() %>%  # Agrega tiles de OpenStreetMap
+  # Agrega el objeto sf al mapa
+  addPolygons(data = Zonas)
+
+
+Cali_WGS84$Barrio_Clean<-toupper(stringi::stri_trans_general(Cali_WGS84$barrio,"Latin-ASCII"))
+
+#Convertir la tabla de viviendas en un objeto espacial
+
+
+Casas_Imputadas_Espacial <- sf::st_as_sf(Casas_Imputadas, coords = c("Longitud", "Latitud"))
+Casas_Imputadas_Espacial
+Casas_Imputadas_Espacial$Barrio_Clean<-as.factor(Casas_Imputadas_Espacial$Barrio_Clean)
+crs <- sf::st_crs("+proj=longlat +datum=WGS84 +no_defs")
+Casas_Imputadas_Espacial <- sf::st_set_crs(Casas_Imputadas_Espacial, crs)
+
+
+#Union de capas
+Casas_Imputadas_join <- dplyr::left_join(Casas_Imputadas_Espacial, as.data.frame(Cali_WGS84), by = "Barrio_Clean")
+Casas_Impitadas_zonas_join <- dplyr::left_join(Cali_WGS84,as.data.frame(Casas_Imputadas_Espacial), by = "Barrio_Clean")
+
+
+
+
+summary(Casas_Imputadas_join$Zonas_IDE)
+
+#Imputacion por datos originales
+for(i in 1:length(Casas_Imputadas_join$Zonas_IDE)){
+  if(is.na(Casas_Imputadas_join$Zonas_IDE[i])== "TRUE"){
+    Casas_Imputadas_join$Zonas_IDE[i] = Casas_Imputadas_join$Zona[i]
+  }
+}
+
+summary(datos_join$Zonas_IDE)
+
+write.table(datos_join, "Casas_Imputadas_join.csv", sep=",", col.names = TRUE)
+
+Casas_Barrios_precio<-Casas_Imputadas_join%>%group_by(Barrio_Clean)%>%summarise(
+  media = mean(Precio),
+  mediana = median(Precio ),
+  IQR = IQR(Precio ),
+  Q1 =quantile(Precio, 0.25),
+  Q3 =quantile(Precio, 0.75),
+  VarCoef = sd(Precio) / mean(Precio),
+  sd = sd(Precio)
+)
+
+Casas_Comuna_precio<-Casas_Imputadas_join%>%group_by(comuna)%>%summarise(
+  media = mean(Precio),
+  mediana = median(Precio ),
+  IQR = IQR(Precio ),
+  Q1 =quantile(Precio, 0.25),
+  Q3 =quantile(Precio, 0.75),
+  VarCoef = sd(Precio) / mean(Precio),
+  sd = sd(Precio)
+)
+
+Casas_Zona_precio<-Casas_Imputadas_join%>%group_by(Zonas_IDE)%>%summarise(
+  media = mean(Precio),
+  mediana = median(Precio ),
+  IQR = IQR(Precio ),
+  Q1 =quantile(Precio, 0.25),
+  Q3 =quantile(Precio, 0.75),
+  VarCoef = sd(Precio) / mean(Precio),
+  sd = sd(Precio)
+)
+
+boxplot(Casas_Zona_precio$mediana)
+
+
+
+Barrios<-sf::read_sf("./sig/Cali_WGS84.gpkg", layer='Barrios')
+Barrios$Barrio_Clean<-toupper(stringi::stri_trans_general(Barrios$barrio,"Latin-ASCII"))
+
+Comunas<-sf::read_sf("./sig/Cali_WGS84.gpkg", layer='Comunas')
+Zonas<-sf::read_sf("./sig/Cali_WGS84.gpkg", layer='Zonas')
+Zonas$Zonas_IDE<-Zonas$Zona
+
+Casas_Barrios_precio_join <- dplyr::left_join(Barrios,as.data.frame(Casas_Barrios_precio), by = "Barrio_Clean")
+Casas_Barrios_precio_join<-Casas_Barrios_precio_join[,1:15]
+Casas_comuna_precio_join <- dplyr::left_join(Comunas,as.data.frame(Casas_Comuna_precio), by = "comuna")
+Casas_comuna_precio_join<-Casas_comuna_precio_join[,1:13]
+Casas_zonas_precio_join <- dplyr::left_join(Zonas,as.data.frame(Casas_Zona_precio), by = "Zonas_IDE")
+Casas_zonas_precio_join<-Casas_zonas_precio_join[,1:10]
+
+
+sf::st_write(Casas_Barrios_precio_join, dsn ="./sig/Barrios_Precio_Total.gpkg",   layer='Casas_Barrios_precio', driver ="GPKG", append=TRUE)
+sf::st_write(Casas_comuna_precio_join, dsn ="./sig/Comuna_Precio_Total.gpkg", layer='Casas_comuna_precio',  driver ="GPKG", append=TRUE)
+sf::st_write(Casas_zonas_precio_join, dsn ="./sig/Zonas_Precio_Total.gpkg", layer='Casas_zonas_precio',  driver ="GPKG", append=TRUE)
+
+
+plot(Casas_Barrios_precio_join$mediana, Casas_Barrios_precio_join$IQR)
+plot(Casas_comuna_precio_join$mediana, Casas_comuna_precio_join$IQR)
+plot(Casas_zonas_precio_join$mediana, Casas_zonas_precio_join$IQR)
+
+Casas_barriosPaleta <- colorNumeric(
+  palette = "YlOrRd",
+  domain = na.omit(Casas_Barrios_precio_join$mediana))
+
+Casas_barriosPaletaIQR<- colorNumeric(
+  palette = "PuBuGn",
+  domain = na.omit(Casas_Barrios_precio_join$IQR))
+
+Casas_labelsMediana <- sprintf(
+  "<strong>%s</strong><br/>%g millones",
+  Casas_Barrios_precio_join$barrio , Casas_Barrios_precio_join$mediana
+) %>% lapply(htmltools::HTML)
+
+Casas_labelsIQR <- sprintf(
+  "<strong>%s</strong><br/>%g millones",
+  Casas_Barrios_precio_join$barrio , Casas_Barrios_precio_join$IQR
+) %>% lapply(htmltools::HTML)
+
+
+leaflet::leaflet(height=700, width = 800)%>%
+  addProviderTiles(providers$CartoDB.DarkMatterNoLabels)%>%
+  addPolygons(data = Casas_Barrios_precio_join, 
+              fillColor =  ~Casas_barriosPaletaIQR(IQR),  weight = 2,
+              opacity = 1,
+              color = "grey",
+              dashArray = "3",
+              group = "IQR",
+              fillOpacity = 1,
+              highlightOptions = highlightOptions(
+                weight = 5,
+                color = "#666",
+                dashArray = "",
+                bringToFront = TRUE),
+              label = Casas_labelsIQR,
+              labelOptions = labelOptions(
+                style = list("font-weight" = "normal", padding = "3px 8px"),
+                textsize = "15px",
+                direction = "auto"))%>%
+  addLegend( position = "bottomleft", pal = barriosPaletaIQR, values = na.omit(Barrios_precio_join$IQR),
+             title = 'IQR Precios',
+             opacity = 1)%>%
+  addPolygons(data = Casas_Barrios_precio_join, 
+              fillColor =  ~Casas_barriosPaleta(mediana),  weight = 2,
+              opacity = 1,
+              color = "grey",
+              dashArray = "3",
+              group = "Mediana",
+              fillOpacity = 1,
+              highlightOptions = highlightOptions(
+                weight = 5,
+                color = "#666",
+                dashArray = "",
+                bringToFront = TRUE),
+              label = Casas_labelsMediana,
+              labelOptions = labelOptions(
+                style = list("font-weight" = "normal", padding = "3px 8px"),
+                textsize = "15px",
+                direction = "auto"))%>%
+  
+  addFullscreenControl(position = "topleft", pseudoFullscreen = TRUE)%>%
+  addLegend( position = "bottomleft", pal = Casas_barriosPaleta, values = na.omit(Casas_Barrios_precio_join$mediana),
+             title = 'Mediana Precios',
+             opacity = 1)%>%
+  
+  addLayersControl(overlayGroups = c("Mediana", "IQR"),    options = layersControlOptions(collapsed = FALSE))%>%
+  addMiniMap(tiles = "CartoDB.Voyager")
