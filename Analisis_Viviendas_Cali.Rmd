@@ -149,7 +149,86 @@ ggplot(na.omit(vivienda_faltantes), aes(x = preciom))+
 
 
 
+```{r Mapa_Precios,  fig.align='center',echo=FALSE, message=FALSE, console=FALSE}
+require(leaflet)
+require(leaflet.extras)
+require(dplyr)
+require(sf)
 
+Barrios<-sf::read_sf("./sig/Cali_WGS84.gpkg", layer='Barrios_Precio_Total')
+
+
+
+
+barriosPaleta <- colorNumeric(
+  palette = "YlOrRd",
+  domain = na.omit(Barrios$mediana))
+barriosPaletaIQR<- colorNumeric(
+  palette = "PuBuGn",
+  domain = na.omit(Barrios$IQR))
+
+labelsMediana <- sprintf(
+  "<strong>%s</strong><br/>%g",
+  Barrios$barrio , Barrios$mediana
+) %>% lapply(htmltools::HTML)
+
+labelsIQR <- sprintf(
+  "<strong>%s</strong><br/>%g",
+  Barrios$barrio , Barrios$IQR
+) %>% lapply(htmltools::HTML)
+
+
+leaflet::leaflet(height=700, width = 800)%>%
+  addProviderTiles(providers$CartoDB.DarkMatterNoLabels)%>%
+  addPolygons(data = Barrios, 
+              fillColor =  ~barriosPaletaIQR(IQR),  weight = 2,
+              opacity = 1,
+              color = "grey",
+              dashArray = "3",
+              group = "IQR",
+              fillOpacity = 1,
+              highlightOptions = highlightOptions(
+                weight = 5,
+                color = "#666",
+                dashArray = "",
+                bringToFront = TRUE),
+              label = labelsIQR,
+              labelOptions = labelOptions(
+                style = list("font-weight" = "normal", padding = "3px 8px"),
+                textsize = "15px",
+                direction = "auto"))%>%
+  addLegend( position = "bottomleft", pal = barriosPaletaIQR, values = na.omit(Barrios$IQR),
+             title = 'IQR Precios',
+             opacity = 1)%>%
+  addPolygons(data = Barrios, 
+              fillColor =  ~barriosPaleta(mediana),  weight = 2,
+              opacity = 1,
+              color = "grey",
+              dashArray = "3",
+              group = "Mediana",
+              fillOpacity = 1,
+              highlightOptions = highlightOptions(
+                weight = 5,
+                color = "#666",
+                dashArray = "",
+               bringToFront = TRUE),
+              label = labelsMediana,
+              labelOptions = labelOptions(
+                style = list("font-weight" = "normal", padding = "3px 8px"),
+                textsize = "15px",
+                direction = "auto"))%>%
+  
+  addFullscreenControl(position = "topleft", pseudoFullscreen = TRUE)%>%
+  addLegend( position = "bottomleft", pal = barriosPaleta, values = na.omit(Barrios$mediana),
+             title = 'Mediana Precios',
+             opacity = 1)%>%
+
+  addLayersControl(overlayGroups = c("Mediana", "IQR"),    options = layersControlOptions(collapsed = FALSE))%>%
+  addMiniMap(tiles = "CartoDB.Voyager")
+
+
+
+```
 
 ## Tipos de viviendas ofertadas
 
@@ -168,6 +247,8 @@ agfsfgfd
 :::
 
 # Anexos
+
+## Revisión de los datos espaciales
 
 Mapa de distribución de precios. Las coordenadas están mal asignadas.
 
@@ -198,3 +279,27 @@ map<-leaflet::leaflet(height=700, width = 800)%>%
    addMiniMap(tiles = "CartoDB.Voyager")
 map
 ```
+
+## Corrección de los datos Espaciales
+
+Filtrado de los datos por fuera del casco urbano
+
+## Revisión de los datos faltantes
+
+<div>
+<p style='text-align:center;'>
+<img src="MdPattern.png" width="900px">
+</p>
+</div>
+
+### Datos Faltantes por casa
+
+#### Pisos
+#### Parqueaderos
+
+### Datos Faltantes por Apartamento
+
+#### Pisos
+#### Parqueaderos
+
+## Imputación

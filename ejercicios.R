@@ -23,6 +23,20 @@ data("vivienda_faltantes")
 View(vivienda_faltantes)
 
 colnames(vivienda_faltantes)
+colnames(vivienda_faltantes)<-c("id", 
+                            "Zona",
+                            "No.Pisos", 
+                            "Estrato", 
+                            "Precio",   
+                            "Area_Construida", 
+                            "No.Parqueaderos",   
+                            "No.Baños",    
+                            "No.Habitaciones",   
+                            "Tipo.Vivienda",      
+                            "Barrio",    
+                            "Longitud",  
+                            "Latitud" 
+)
 
 datos_Vivienda<-vivienda_faltantes
 dim(datos_Vivienda)
@@ -162,14 +176,14 @@ datos_Vivienda$Barrio_Clean<-dplyr::recode_factor(datos_Vivienda$Barrio,
                                                   "ALTOS DE SANTA" = "SECTOR ALTOS DE SANTA ISABEL",
                                                   "ALAMEDA DEL RIO" = "CIUDAD DE LOS ALAMOS",
                                                   "ARBOLEDA" = "ARBOLEDAS",
-                                                  "ARBOLEDA CAMPESTRE CANDELARIA" = "NA",
-                                                  "AUTOPISTA SUR" = "NA",
+                                                  "ARBOLEDA CAMPESTRE CANDELARIA" = "FUERA DE CALI",
+                                                  "AUTOPISTA SUR" = "FUERA DE CALI",
                                                   "BAJO AGUACATAL" = "AGUACATAL",
                                                   "BARRANQUILLA" = "LOS PARQUES BARRANQUILLA",
                                                   "BARRIO 7DE AGOSTO" = "SIETE DE AGOSTO",
                                                   "BARRIO EL RECUERDO" = "EL RECUERDO",
                                                   "BARRIO EUCARISTICO" = "EUCARISTICO",
-                                                  "BARRIO TRANQUILO Y" = "NA",
+                                                  "BARRIO TRANQUILO Y" = "FUERA DE CALI",
                                                   "BASE A√(C)REA" = "BASE AEREA",
                                                   "BELLA SUIZA" = "CANAVERAL",
                                                   "BELLA SUIZA ALTA" = "CANAVERAL",
@@ -183,7 +197,7 @@ datos_Vivienda$Barrio_Clean<-dplyr::recode_factor(datos_Vivienda$Barrio,
                                                   "BRISAS DE LOS" = "BRISAS DE LOS ALAMOS",
                                                   "BRISAS DEL GUABITO" = "VILLA DEL PRADO - EL GUABITO",
                                                   "BUENO MADRID" = "UNIDAD RESIDENCIAL BUENO MADRID",
-                                                  "CALI" = "NA",
+                                                  "CALI" = "FUERA DE CALI",
                                                   "CALI BELLA" = "FEPICOL",
                                                   "CALI CANTO" = "LILI",
                                                   "CALIBELLA" = "FEPICOL",
@@ -199,11 +213,11 @@ datos_Vivienda$Barrio_Clean<-dplyr::recode_factor(datos_Vivienda$Barrio,
                                                   "CANAVERALES" = "CANAVERALES - LOS SAMANES",
                                                   "CANAVERALES LOS SAMANES" = "CANAVERALES - LOS SAMANES",
                                                   "CAPRI" = "CIUDAD CAPRI",
-                                                  "CASCAJAL" = "NA",
+                                                  "CASCAJAL" = "FUERA DE CALI",
                                                   "CATAYA REAL" = "PARCELACIONES PANCE",
                                                   "CEIBAS" = "LAS CEIBAS",
                                                   "CENTELSA" = "MENGA",
-                                                  "CENTRO" = "NA",
+                                                  "CENTRO" = "FUERA DE CALI",
                                                   "CERRO CRISTALES" = "SECTOR ALTOS DE SANTA ISABEL",
                                                   "CERROS DE GUADALUPE" = "SECTOR CANAVERALEJO GUADALUPE",
                                                   "CHIMINANGOS" = "CHIMINANGOS I",
@@ -211,16 +225,16 @@ datos_Vivienda$Barrio_Clean<-dplyr::recode_factor(datos_Vivienda$Barrio,
                                                   "CHIMINANGOS 2 ETAPA" = "CHIMINANGOS II",
                                                   "CIUDAD ANTEJARDIN" = "URBANIZACION CIUDAD JARDIN",
                                                   "CIUDAD CORDOBA RESERVADO" = "CIUDAD CORDOBA",
-                                                  "CIUDAD COUNTRY" = "NA",
-                                                  "CIUDAD DEL CAMPO" = "NA",
+                                                  "CIUDAD COUNTRY" = "FUERA DE CALI",
+                                                  "CIUDAD DEL CAMPO" = "FUERA DE CALI",
                                                   "CIUDAD JARDIN" = "URBANIZACION CIUDAD JARDIN",
                                                   "CIUDAD JARDIN PANCE" = "PARCELACIONES PANCE",
                                                   "CIUDAD LOS ALAMOS" = "CIUDAD DE LOS ALAMOS",
                                                   "CIUDAD MEL√(C)NDEZ" = "MELENDEZ",
                                                   "CIUDAD MELENDEZ" = "MELENDEZ",
                                                   "CIUDAD MODELO" = "LOS SAUCES",
-                                                  "CIUDAD PACIFICA" = "NA",
-                                                  "CIUDAD REAL" = "NA",
+                                                  "CIUDAD PACIFICA" = "FUERA DE CALI",
+                                                  "CIUDAD REAL" = "FUERA DE CALI",
                                                   "CIUDADELA DEL RIO" = "CIUDADELA DEL RIO - CVC",
                                                   "CIUDADELA MELENDEZ" = "SECTOR MELENDEZ",
                                                   "CIUDADELA PASO ANCHO" = "CIUDADELA PASOANCHO",
@@ -244,7 +258,7 @@ datos_Vivienda$Barrio_Clean<-dplyr::recode_factor(datos_Vivienda$Barrio,
                                                   "FARRALLONES DE PANCE" = "PARCELACIONES PANCE",
                                                   "FLORA" = "LA FLORA",
                                                   "FLORALIA" = "CIUDADELA FLORALIA",
-                                                  "FUENTES DE LA" = "NA",
+                                                  "FUENTES DE LA" = "FUERA DE CALI",
                                                   "GAITAN" = "JORGE ELIECER GAITAN",
                                                   "GRAN LIMONAR" = "EL GRAN LIMONAR",
                                                   "GUADALUPE" = "CUARTO DE LEGUA - GUADALUPE",
@@ -254,24 +268,24 @@ datos_Vivienda$Barrio_Clean<-dplyr::recode_factor(datos_Vivienda$Barrio,
                                                   "INGENIO" = "EL INGENIO",
                                                   "INGENIO I" = "EL INGENIO",
                                                   "INGENIO II" = "EL INGENIO",
-                                                  "JAMUNDI" = "NA",
-                                                  "JAMUNDI ALFAGUARA" = "NA",
+                                                  "JAMUNDI" = "FUERA DE CALI",
+                                                  "JAMUNDI ALFAGUARA" = "FUERA DE CALI",
                                                   "JOSE MANUEL MARROQUIN" = "JOSE MANUEL MARROQUIN I",
                                                   "JUANAMB√∫" = "JUANAMBU",
                                                   "LA ARBOLEDA" = "ARBOLEDAS",
-                                                  "LA BUITRERA" = "NA",
+                                                  "LA BUITRERA" = "FUERA DE CALI",
                                                   "LA CEIBAS" = "LAS CEIBAS",
                                                   "LA LUISA" = "SECTOR ALTO LOS CHORROS",
-                                                  "LA MORADA" = "NA",
+                                                  "LA MORADA" = "FUERA DE CALI",
                                                   "LA NUEVA BASE" = "URBANIZACION LA NUEVA BASE",
                                                   "LA PORTADA AL" = "SANTA TERESITA",
                                                   "LA PRIMAVERA" = "PRIMAVERA",
-                                                  "LA REFORMA" = "NA",
+                                                  "LA REFORMA" = "FUERA DE CALI",
                                                   "LA RIVERA" = "LA RIVERA I",
                                                   "LA RIVERA II" = "LA RIVERA I",
                                                   "LA RIVERITA" = "PARCELACIONES PANCE",
                                                   "LA RIVIERA" = "LOS ANDES B - LA RIVIERA",
-                                                  "LA VILLA DEL" = "NA",
+                                                  "LA VILLA DEL" = "FUERA DE CALI",
                                                   "LAFLORA" = "LA FLORA",
                                                   "LARES DE COMFENALCO" = "SECTOR PUENTE DEL COMERCIO",
                                                   "LAS AM√(C)RICAS" = "LAS AMERICAS",
@@ -296,16 +310,16 @@ datos_Vivienda$Barrio_Clean<-dplyr::recode_factor(datos_Vivienda$Barrio,
                                                   "NUEVA BASE" = "URBANIZACION NUEVA BASE",
                                                   "OASIS DE COMFANDI" = "LOS GUADUALES",
                                                   "OASIS DE PASOANCHO" = "COLSEGUROS ANDES",
-                                                  "OCCIDENTE" = "NA",
+                                                  "OCCIDENTE" = "FUERA DE CALI",
                                                   "PACARA" = "LA MERCED",
                                                   "PALMAS DEL INGENIO" = "EL INGENIO",
                                                   "PAMPALINDA" = "PAMPA LINDA",
                                                   "PANCE" = "PARCELACIONES PANCE",
                                                   "PARQUE RESIDENCIAL EL" = "EL BOSQUE",
-                                                  "POBLADO CAMPESTRE" = "NA",
+                                                  "POBLADO CAMPESTRE" = "FUERA DE CALI",
                                                   "PONCE" = "PARCELACIONES PANCE",
                                                   "PORTADA DE COMFANDI" = "LOS ALCAZARES",
-                                                  "PORTALES DE COMFANDI" = "NA",
+                                                  "PORTALES DE COMFANDI" = "FUERA DE CALI",
                                                   "PUENTE DEL COMERCIO" = "SECTOR PUENTE DEL COMERCIO",
                                                   "PUENTE PALMA" = "CUARTO DE LEGUA - GUADALUPE",
                                                   "PASEO DE LOS" = "LOS PARQUES BARRANQUILLA",
@@ -316,7 +330,7 @@ datos_Vivienda$Barrio_Clean<-dplyr::recode_factor(datos_Vivienda$Barrio,
                                                   "RINCON DE LA" = "UNIDAD RESIDENCIAL BUENO MADRID",
                                                   "RINCON DE SALOMIA" = "SALOMIA",
                                                   "RIVERAS DEL VALLE" = "EL CANEY",
-                                                  "ROZO LA TORRE" = "NA",
+                                                  "ROZO LA TORRE" = "FUERA DE CALI",
                                                   "SAMANES" = "CANAVERALES - LOS SAMANES",
                                                   "SAMANES DE GUADALUPE" = "CANAVERALES - LOS SAMANES",
                                                   "SAMECO" = "URBANIZACION LA FLORA",
@@ -355,20 +369,20 @@ datos_Vivienda$Barrio_Clean<-dplyr::recode_factor(datos_Vivienda$Barrio,
                                                   "VILLA DEL PARQUE" = "LOS PARQUES BARRANQUILLA",
                                                   "VILLA DEL PRADO" = "VILLA DEL PRADO - EL GUABITO",
                                                   "VILLAS DE VERACRUZ" = "SALOMIA",
-                                                  "ZONA CENTRO" = "NA",
-                                                  "ZONA NORTE" = "NA",
-                                                  "ZONA NORTE LOS" = "NA",
-                                                  "ZONA OESTE" = "NA",
-                                                  "ZONA ORIENTE" = "NA",
-                                                  "ZONA RESIDENCIAL" = "NA",
-                                                  "ZONA SUR" = "NA"
+                                                  "ZONA CENTRO" = "FUERA DE CALI",
+                                                  "ZONA NORTE" = "FUERA DE CALI",
+                                                  "ZONA NORTE LOS" = "FUERA DE CALI",
+                                                  "ZONA OESTE" = "FUERA DE CALI",
+                                                  "ZONA ORIENTE" = "FUERA DE CALI",
+                                                  "ZONA RESIDENCIAL" = "FUERA DE CALI",
+                                                  "ZONA SUR" = "FUERA DE CALI"
 )
 
 
 
 datos_Vivienda$Barrio_Clean<-as.factor(datos_Vivienda$Barrio_Clean)
-boxplot(datos_Vivienda$Precio ~ datos_Vivienda$Barrio_Clean)
 
+datos_Vivienda<- datos_Vivienda %>% subset(Barrio_Clean != "FUERA DE CALI" | Barrio_Clean != NA)
 
 
 write.csv2(datos_Vivienda, "datos_Vivienda.csv")
@@ -474,6 +488,11 @@ sf::st_write(Barrios_precio_join, dsn ="./sig/Barrios_Precio_Total.gpkg",   laye
 sf::st_write(comuna_precio_join, dsn ="./sig/Comuna_Precio_Total.gpkg", layer='Comuna_Precio_Total',  driver ="GPKG", append=TRUE)
 sf::st_write(zonas_precio_join, dsn ="./sig/Zonas_Precio_Total.gpkg", layer='Zonas_Precio_Total',  driver ="GPKG", append=TRUE)
 
+
+plot(Barrios_precio_join$mediana, Barrios_precio_join$IQR)
+plot(comuna_precio_join$mediana, comuna_precio_join$IQR)
+plot(zonas_precio_join$mediana, zonas_precio_join$IQR)
+
 barriosPaleta <- colorNumeric(
   palette = "YlOrRd",
   domain = na.omit(Barrios_precio_join$mediana))
@@ -482,35 +501,18 @@ barriosPaletaIQR<- colorNumeric(
   domain = na.omit(Barrios_precio_join$IQR))
 
 labelsMediana <- sprintf(
-  "<strong>%s</strong><br/>%g 000 ",
+  "<strong>%s</strong><br/>%g millones",
   Barrios_precio_join$barrio , Barrios_precio_join$mediana
 ) %>% lapply(htmltools::HTML)
 
 labelsIQR <- sprintf(
-  "<strong>%s</strong><br/>%g",
+  "<strong>%s</strong><br/>%g millones",
   Barrios_precio_join$barrio , Barrios_precio_join$IQR
 ) %>% lapply(htmltools::HTML)
 
 
 leaflet::leaflet(height=700, width = 800)%>%
   addProviderTiles(providers$CartoDB.DarkMatterNoLabels)%>%
-  addPolygons(data = Barrios_precio_join, 
-              fillColor =  ~barriosPaleta(mediana),  weight = 2,
-              opacity = 1,
-              color = "grey",
-              dashArray = "3",
-              group = "Mediana",
-              fillOpacity = 1,
-              highlightOptions = highlightOptions(
-                weight = 5,
-                color = "#666",
-                dashArray = "",
-               bringToFront = TRUE),
-              label = labelsMediana,
-              labelOptions = labelOptions(
-                style = list("font-weight" = "normal", padding = "3px 8px"),
-                textsize = "15px",
-                direction = "auto"))%>%
   addPolygons(data = Barrios_precio_join, 
               fillColor =  ~barriosPaletaIQR(IQR),  weight = 2,
               opacity = 1,
@@ -528,14 +530,228 @@ leaflet::leaflet(height=700, width = 800)%>%
                 style = list("font-weight" = "normal", padding = "3px 8px"),
                 textsize = "15px",
                 direction = "auto"))%>%
+  addLegend( position = "bottomleft", pal = barriosPaletaIQR, values = na.omit(Barrios_precio_join$IQR),
+             title = 'IQR Precios',
+             opacity = 1)%>%
+  addPolygons(data = Barrios_precio_join, 
+              fillColor =  ~barriosPaleta(mediana),  weight = 2,
+              opacity = 1,
+              color = "grey",
+              dashArray = "3",
+              group = "Mediana",
+              fillOpacity = 1,
+              highlightOptions = highlightOptions(
+                weight = 5,
+                color = "#666",
+                dashArray = "",
+               bringToFront = TRUE),
+              label = labelsMediana,
+              labelOptions = labelOptions(
+                style = list("font-weight" = "normal", padding = "3px 8px"),
+                textsize = "15px",
+                direction = "auto"))%>%
+  
   addFullscreenControl(position = "topleft", pseudoFullscreen = TRUE)%>%
   addLegend( position = "bottomleft", pal = barriosPaleta, values = na.omit(Barrios_precio_join$mediana),
-             title = 'Precios',
+             title = 'Mediana Precios',
              opacity = 1)%>%
-  addLegend( position = "bottomleft", pal = barriosPaletaIQR, values = na.omit(Barrios_precio_join$IQR),
-             title = 'Precios',
-             opacity = 1)%>%
+
   addLayersControl(overlayGroups = c("Mediana", "IQR"),    options = layersControlOptions(collapsed = FALSE))%>%
   addMiniMap(tiles = "CartoDB.Voyager")
 
 
+
+#Análisis de datos faltantes###
+par(mfrow=c(1,1))
+
+
+require(mice)
+png("Datos_limpios_MdPattern.png", width = 1250, height = 750, units = "px", pointsize = 12, bg = "#FFFFFF", res = 100 )
+md.pattern(datos_Vivienda[,c(1:13)], rotate.names = TRUE, plot=TRUE) 
+dev.off()
+
+png("Datos_Originales_MdPattern.png", width = 1250, height = 750, units = "px", pointsize = 12, bg = "#FFFFFF", res = 100 )
+md.pattern(vivienda_faltantes, rotate.names = TRUE, plot=TRUE) 
+dev.off()
+
+datos_Casa<-datos_Vivienda%>%subset(Tipo.Vivienda == "Casa")
+
+
+
+png("datos_Casa_MdPattern.png", width = 1250, height = 750, units = "px", pointsize = 12, bg = "#FFFFFF", res = 100 )
+md.pattern(datos_Casa[,c(1:13)], rotate.names = TRUE, plot=TRUE) 
+dev.off()
+
+
+
+#Casas vs Estrato
+Casa_Estrato03<-datos_Casa%>%subset(Estrato == "3")
+Casa_Estrato04<-datos_Casa%>%subset(Estrato == "4")
+Casa_Estrato05<-datos_Casa%>%subset(Estrato == "5")
+Casa_Estrato06<-datos_Casa%>%subset(Estrato == "6")
+
+Casa_Estrato03$No.Pisos<-as.factor(Casa_Estrato03$No.Pisos)
+Casa_Estrato04$No.Pisos<-as.factor(Casa_Estrato04$No.Pisos)
+Casa_Estrato05$No.Pisos<-as.factor(Casa_Estrato05$No.Pisos)
+Casa_Estrato06$No.Pisos<-as.factor(Casa_Estrato06$No.Pisos)
+
+
+png("Casa_Estrato_Pisos.png", width = 1250, height = 750, units = "px", pointsize = 12, bg = "#FFFFFF", res = 100 )
+par(mfrow=c(2,2))
+barplot(summary(Casa_Estrato03$No.Pisos), main = "No.Pisos casas de estrato 3", xlab = "Pisos", ylab="Frecuencia", col="#367BB5", border = 'white', bg="#FFFFFF")
+barplot(summary(Casa_Estrato04$No.Pisos), main = "No.Pisos casas de estrato 4", xlab = "Pisos", ylab="Frecuencia", col="#367BB5", border = 'white', bg="#FFFFFF")
+barplot(summary(Casa_Estrato05$No.Pisos), main = "No.Pisos casas de estrato 5", xlab = "Pisos", ylab="Frecuencia", col="#367BB5", border = 'white', bg="#FFFFFF")
+barplot(summary(Casa_Estrato06$No.Pisos), main = "No.Pisos casas de estrato 6", xlab = "Pisos", ylab="Frecuencia", col="#367BB5", border = 'white', bg="#FFFFFF")
+
+dev.off()
+
+
+#Casas vs Parqueaderos
+
+Casa_Estrato03$No.Parqueaderos<-as.factor(Casa_Estrato03$No.Parqueaderos)
+Casa_Estrato04$No.Parqueaderos<-as.factor(Casa_Estrato04$No.Parqueaderos)
+Casa_Estrato05$No.Parqueaderos<-as.factor(Casa_Estrato05$No.Parqueaderos)
+Casa_Estrato06$No.Parqueaderos<-as.factor(Casa_Estrato06$No.Parqueaderos)
+
+
+png("Casa_Estrato_Parqueaderos.png", width = 1250, height = 750, units = "px", pointsize = 12, bg = "#FFFFFF", res = 100 )
+par(mfrow=c(2,2))
+barplot(summary(Casa_Estrato03$No.Parqueaderos), main = "No.Parqueaderos casas de estrato 3", xlab = "Pisos", ylab="Frecuencia", col="#367BB5", border = 'white', bg="#FFFFFF")
+barplot(summary(Casa_Estrato04$No.Parqueaderos), main = "No.Parqueaderos casas de estrato 4", xlab = "Pisos", ylab="Frecuencia", col="#367BB5", border = 'white', bg="#FFFFFF")
+barplot(summary(Casa_Estrato05$No.Parqueaderos), main = "No.Parqueaderos casas de estrato 5", xlab = "Pisos", ylab="Frecuencia", col="#367BB5", border = 'white', bg="#FFFFFF")
+barplot(summary(Casa_Estrato06$No.Parqueaderos), main = "No.Parqueaderos casas de estrato 6", xlab = "Pisos", ylab="Frecuencia", col="#367BB5", border = 'white', bg="#FFFFFF")
+
+dev.off()
+
+
+datos_Apartamento<-datos_Vivienda%>%subset(Tipo.Vivienda == "Apartamento")
+
+png("datos_Apartamento_MdPattern.png", width = 1250, height = 750, units = "px", pointsize = 12, bg = "#FFFFFF", res = 100 )
+md.pattern(datos_Apartamento, rotate.names = TRUE, plot=TRUE) 
+dev.off()
+
+
+#Apartamentos vs Estrato
+Apartamento_Estrato03<-datos_Apartamento%>%subset(Estrato == "3")
+Apartamento_Estrato04<-datos_Apartamento%>%subset(Estrato == "4")
+Apartamento_Estrato05<-datos_Apartamento%>%subset(Estrato == "5")
+Apartamento_Estrato06<-datos_Apartamento%>%subset(Estrato == "6")
+
+Apartamento_Estrato03$No.Pisos<-as.factor(Apartamento_Estrato03$No.Pisos)
+Apartamento_Estrato04$No.Pisos<-as.factor(Apartamento_Estrato04$No.Pisos)
+Apartamento_Estrato05$No.Pisos<-as.factor(Apartamento_Estrato05$No.Pisos)
+Apartamento_Estrato06$No.Pisos<-as.factor(Apartamento_Estrato06$No.Pisos)
+
+
+png("Apartamento_Estrato_Pisos.png", width = 1250, height = 750, units = "px", pointsize = 12, bg = "#FFFFFF", res = 100 )
+par(mfrow=c(2,2))
+barplot(summary(Apartamento_Estrato03$No.Pisos), main = "No.Pisos Apartamentos de estrato 3", xlab = "Pisos", ylab="Frecuencia", col="#367BB5", border = 'white', bg="#FFFFFF")
+barplot(summary(Apartamento_Estrato04$No.Pisos), main = "No.Pisos Apartamentos de estrato 4", xlab = "Pisos", ylab="Frecuencia", col="#367BB5", border = 'white', bg="#FFFFFF")
+barplot(summary(Apartamento_Estrato05$No.Pisos), main = "No.Pisos Apartamentos de estrato 5", xlab = "Pisos", ylab="Frecuencia", col="#367BB5", border = 'white', bg="#FFFFFF")
+barplot(summary(Apartamento_Estrato06$No.Pisos), main = "No.Pisos Apartamentos de estrato 6", xlab = "Pisos", ylab="Frecuencia", col="#367BB5", border = 'white', bg="#FFFFFF")
+
+dev.off()
+
+
+#Apartamentos vs Parqueaderos
+
+Apartamento_Estrato03$No.Parqueaderos<-as.factor(Apartamento_Estrato03$No.Parqueaderos)
+Apartamento_Estrato04$No.Parqueaderos<-as.factor(Apartamento_Estrato04$No.Parqueaderos)
+Apartamento_Estrato05$No.Parqueaderos<-as.factor(Apartamento_Estrato05$No.Parqueaderos)
+Apartamento_Estrato06$No.Parqueaderos<-as.factor(Apartamento_Estrato06$No.Parqueaderos)
+
+
+png("Apartamento_Estrato_Parqueaderos.png", width = 1250, height = 750, units = "px", pointsize = 12, bg = "#FFFFFF", res = 100 )
+par(mfrow=c(2,2))
+barplot(summary(Apartamento_Estrato03$No.Parqueaderos), main = "No.Parqueaderos Apartamentos de estrato 3", xlab = "Pisos", ylab="Frecuencia", col="#367BB5", border = 'white', bg="#FFFFFF")
+barplot(summary(Apartamento_Estrato04$No.Parqueaderos), main = "No.Parqueaderos Apartamentos de estrato 4", xlab = "Pisos", ylab="Frecuencia", col="#367BB5", border = 'white', bg="#FFFFFF")
+barplot(summary(Apartamento_Estrato05$No.Parqueaderos), main = "No.Parqueaderos Apartamentos de estrato 5", xlab = "Pisos", ylab="Frecuencia", col="#367BB5", border = 'white', bg="#FFFFFF")
+barplot(summary(Apartamento_Estrato06$No.Parqueaderos), main = "No.Parqueaderos Apartamentos de estrato 6", xlab = "Pisos", ylab="Frecuencia", col="#367BB5", border = 'white', bg="#FFFFFF")
+
+dev.off()
+
+
+#Imputacion de datos####
+
+# Casas
+
+Casa_Estrato03_Imp<-Casa_Estrato03
+Casa_Estrato04_Imp<-Casa_Estrato04
+Casa_Estrato05_Imp<-Casa_Estrato05
+Casa_Estrato06_Imp<-Casa_Estrato06
+
+Casa_Estrato03_Imp$No.Parqueaderos[is.na(Casa_Estrato03_Imp$No.Parqueaderos)]<-1
+Casa_Estrato04_Imp$No.Parqueaderos[is.na(Casa_Estrato04_Imp$No.Parqueaderos)]<-1
+Casa_Estrato05_Imp$No.Parqueaderos[is.na(Casa_Estrato05_Imp$No.Parqueaderos)]<-2
+Casa_Estrato06_Imp$No.Parqueaderos[is.na(Casa_Estrato06_Imp$No.Parqueaderos)]<-2
+
+Casa_Estrato03_Imp$No.Pisos[is.na(Casa_Estrato03_Imp$No.Pisos)]<-2
+Casa_Estrato04_Imp$No.Pisos[is.na(Casa_Estrato04_Imp$No.Pisos)]<-2
+Casa_Estrato05_Imp$No.Pisos[is.na(Casa_Estrato05_Imp$No.Pisos)]<-2
+Casa_Estrato06_Imp$No.Pisos[is.na(Casa_Estrato06_Imp$No.Pisos)]<-2
+
+Casas_Imputadas<-rbind(Casa_Estrato03_Imp, Casa_Estrato04_Imp, Casa_Estrato05_Imp, Casa_Estrato06_Imp)
+
+png("datos_Casa_Imputadas_MdPattern.png", width = 1250, height = 750, units = "px", pointsize = 12, bg = "#FFFFFF", res = 100 )
+md.pattern(Casas_Imputadas, rotate.names = TRUE, plot=TRUE) 
+dev.off()
+
+# Apartamentos
+
+Apartamento_Estrato03_Imp<-Apartamento_Estrato03
+Apartamento_Estrato04_Imp<-Apartamento_Estrato04
+Apartamento_Estrato05_Imp<-Apartamento_Estrato05
+Apartamento_Estrato06_Imp<-Apartamento_Estrato06
+
+Apartamento_Estrato03_Imp$No.Parqueaderos[is.na(Apartamento_Estrato03_Imp$No.Parqueaderos)]<-1
+Apartamento_Estrato04_Imp$No.Parqueaderos[is.na(Apartamento_Estrato04_Imp$No.Parqueaderos)]<-1
+Apartamento_Estrato05_Imp$No.Parqueaderos[is.na(Apartamento_Estrato05_Imp$No.Parqueaderos)]<-2
+Apartamento_Estrato06_Imp$No.Parqueaderos[is.na(Apartamento_Estrato06_Imp$No.Parqueaderos)]<-2
+
+Apartamento_Estrato03_Imp$No.Pisos[is.na(Apartamento_Estrato03_Imp$No.Pisos)]<-5
+Apartamento_Estrato04_Imp$No.Pisos[is.na(Apartamento_Estrato04_Imp$No.Pisos)]<-5
+Apartamento_Estrato05_Imp$No.Pisos[is.na(Apartamento_Estrato05_Imp$No.Pisos)]<-3
+Apartamento_Estrato06_Imp$No.Pisos[is.na(Apartamento_Estrato06_Imp$No.Pisos)]<-3
+
+Apartamento_Imputadas<-rbind(Apartamento_Estrato03_Imp, Apartamento_Estrato04_Imp, Apartamento_Estrato05_Imp, Apartamento_Estrato06_Imp)
+
+png("datos_Apartamento_Imputadas_MdPattern.png", width = 1250, height = 750, units = "px", pointsize = 12, bg = "#FFFFFF", res = 100 )
+md.pattern(Apartamento_Imputadas, rotate.names = TRUE, plot=TRUE) 
+dev.off()
+
+
+#ANALISIS ESTADISTICO CON DATOS IMPUTADOS
+
+#Casas
+png("Casa_Estrato_Pisos_Imputadas.png", width = 1250, height = 750, units = "px", pointsize = 12, bg = "#FFFFFF", res = 100 )
+par(mfrow=c(2,2))
+barplot(summary(Casa_Estrato03_Imp$No.Pisos), main = "No.Pisos casas de estrato 3", xlab = "Pisos", ylab="Frecuencia", col="#367BB5", border = 'white', bg="#FFFFFF")
+barplot(summary(Casa_Estrato04_Imp$No.Pisos), main = "No.Pisos casas de estrato 4", xlab = "Pisos", ylab="Frecuencia", col="#367BB5", border = 'white', bg="#FFFFFF")
+barplot(summary(Casa_Estrato05_Imp$No.Pisos), main = "No.Pisos casas de estrato 5", xlab = "Pisos", ylab="Frecuencia", col="#367BB5", border = 'white', bg="#FFFFFF")
+barplot(summary(Casa_Estrato06_Imp$No.Pisos), main = "No.Pisos casas de estrato 6", xlab = "Pisos", ylab="Frecuencia", col="#367BB5", border = 'white', bg="#FFFFFF")
+dev.off()
+
+png("Casa_Estrato_Parqueaderos_Imputadas.png", width = 1250, height = 750, units = "px", pointsize = 12, bg = "#FFFFFF", res = 100 )
+par(mfrow=c(2,2))
+barplot(summary(Casa_Estrato03_Imp$No.Parqueaderos), main = "No.Parqueaderos casas de estrato 3", xlab = "Pisos", ylab="Frecuencia", col="#367BB5", border = 'white', bg="#FFFFFF")
+barplot(summary(Casa_Estrato04_Imp$No.Parqueaderos), main = "No.Parqueaderos casas de estrato 4", xlab = "Pisos", ylab="Frecuencia", col="#367BB5", border = 'white', bg="#FFFFFF")
+barplot(summary(Casa_Estrato05_Imp$No.Parqueaderos), main = "No.Parqueaderos casas de estrato 5", xlab = "Pisos", ylab="Frecuencia", col="#367BB5", border = 'white', bg="#FFFFFF")
+barplot(summary(Casa_Estrato06_Imp$No.Parqueaderos), main = "No.Parqueaderos casas de estrato 6", xlab = "Pisos", ylab="Frecuencia", col="#367BB5", border = 'white', bg="#FFFFFF")
+dev.off()
+
+#Apartamentos
+png("Apartamento_Estrato_Pisos_Imputadas.png", width = 1250, height = 750, units = "px", pointsize = 12, bg = "#FFFFFF", res = 100 )
+par(mfrow=c(2,2))
+barplot(summary(Apartamento_Estrato03_Imp$No.Pisos), main = "No.Pisos Apartamentos de estrato 3", xlab = "Pisos", ylab="Frecuencia", col="#367BB5", border = 'white', bg="#FFFFFF")
+barplot(summary(Apartamento_Estrato04_Imp$No.Pisos), main = "No.Pisos Apartamentos de estrato 4", xlab = "Pisos", ylab="Frecuencia", col="#367BB5", border = 'white', bg="#FFFFFF")
+barplot(summary(Apartamento_Estrato05_Imp$No.Pisos), main = "No.Pisos Apartamentos de estrato 5", xlab = "Pisos", ylab="Frecuencia", col="#367BB5", border = 'white', bg="#FFFFFF")
+barplot(summary(Apartamento_Estrato06_Imp$No.Pisos), main = "No.Pisos Apartamentos de estrato 6", xlab = "Pisos", ylab="Frecuencia", col="#367BB5", border = 'white', bg="#FFFFFF")
+dev.off()
+
+png("Apartamento_Estrato_Parqueaderos_Imputadas.png", width = 1250, height = 750, units = "px", pointsize = 12, bg = "#FFFFFF", res = 100 )
+par(mfrow=c(2,2))
+barplot(summary(Apartamento_Estrato03_Imp$No.Parqueaderos), main = "No.Parqueaderos Apartamentos de estrato 3", xlab = "Pisos", ylab="Frecuencia", col="#367BB5", border = 'white', bg="#FFFFFF")
+barplot(summary(Apartamento_Estrato04_Imp$No.Parqueaderos), main = "No.Parqueaderos Apartamentos de estrato 4", xlab = "Pisos", ylab="Frecuencia", col="#367BB5", border = 'white', bg="#FFFFFF")
+barplot(summary(Apartamento_Estrato05_Imp$No.Parqueaderos), main = "No.Parqueaderos Apartamentos de estrato 5", xlab = "Pisos", ylab="Frecuencia", col="#367BB5", border = 'white', bg="#FFFFFF")
+barplot(summary(Apartamento_Estrato06_Imp$No.Parqueaderos), main = "No.Parqueaderos Apartamentos de estrato 6", xlab = "Pisos", ylab="Frecuencia", col="#367BB5", border = 'white', bg="#FFFFFF")
+dev.off()
