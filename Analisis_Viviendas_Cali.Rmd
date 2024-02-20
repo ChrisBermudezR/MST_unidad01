@@ -16,7 +16,7 @@ output:
         smooth_scroll: false
     number_sections: true
     theme: default
-   # code_folding: hide
+    code_folding: hide
 ---
 
 # Introducción
@@ -29,25 +29,27 @@ Los análisis de ofertas del mercado inmobiliario son relevantes para comprender
 
 # Objetivos
 
-Este informe tiene como objetivo el análisis del mercado inmobiliario en el área urbana de la ciudad de Cali.
+
 
 ## Objetivo General
 
-Presentar un análisis de precios en las diferentes zonas de Cali.
-
-Presentar un análisis dde lso tipos de viviendas más ofertadas en la ciudad de Cali.
-
-Presentar un análisis de las características más relevantes de la oferta de vivienda en Cali.
+Este informe tiene como objetivo el análisis del mercado inmobiliario en el área urbana de la ciudad de Cali.
 
 ## Objetivos Específicos
+
+1. Presentar un análisis de precios en las diferentes zonas de Cali.
+
+2. Presentar un análisis de lo stipos de viviendas más ofertadas en la ciudad de Cali.
+
+3. Presentar un análisis de las características más relevantes de la oferta de vivienda en Cali.
 
 # Métodos {.tabset}
 
 ## Área de Estudio
 
-El área de estudio se enfocó en la zonal urbana del municipio de Santiago de Cali, Valle del Cauca, Colombia. (Figura \@ref(fig:mapa)).
+El área de estudio se enfocó en la zonal urbana del municipio de Santiago de Cali, Valle del Cauca, Colombia. (Figura 1).
 
-```{r mapa,  echo=FALSE, message=FALSE, console=FALSE, fig.id=TRUE}
+```{r mapa,  echo=TRUE, message=FALSE, console=FALSE, fig.id=TRUE}
 require(leaflet)
 require(leaflet.extras)
 require(sf)
@@ -77,65 +79,87 @@ imperial = FALSE, updateWhenIdle = TRUE))%>%
 
 **Figura 1.** Mapa de la ciudad de Santiago de Cali.
 
-## Fuente de datos
-
-### Datos externos
-
-La capa geográfica de barrios y comunas fue descargada de la [*Infraestructura de Datos Espaciales de Cali*](http://ws-idesc.cali.gov.co:80/geoserver/idesc/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=idesc:mc_barrios&maxFeatures=400&outputFormat=SHAPE-ZIP).
-
-### Datos proporcionados
-
-Las fuentes de datos para este análisis provienen del paquete "paqueteMETODOS" del repositorio de *Github* <https://github.com/dgonxalex80/paqueteMODELOS>.
-
-Este conjunto de datos comprende 13 atributos y 8330 entradas, que caracterizan los precios, los tipos de vivienda, el número de habitaciones, el estrato, el número de parqueaderos, el número de baños y el área construida de lo disponible en el mercado inmobiliario de la ciudad de Cali.
-
-**Tabla 1 .** Conjunto de datos utilizado en este trabajo.
-
-```{r histgrama, echo=FALSE, message=FALSE, console=FALSE}
-library(paqueteMETODOS)
-library(reactable)
-
-data("vivienda_faltantes")
-
-reactable(vivienda_faltantes)
-
-```
 
 ## Análisis de datos
 
-Todos los análisis y limpieza de datos se realizaron con el lenguaje de programación R [@Rteam]. Para la limpieza y organización de datos se utilizó el paquete "dplyr" [@dplyr].
+En este informe, se llevó a cabo un análisis exploratorio de datos del mercado inmobiliario utilizando la información proporcionada por la inmobiliaria B&C. Inicialmente, se exploraron estos datos en busca de consistencias en la información. Una vez que se completó la limpieza de los datos y se imputaron los valores faltantes, se procedió a realizar análisis estadísticos que incluyeron el cálculo de medidas de tendencia central y dispersión de los datos.
+
+Para evaluar los datos obtenidos, se examinó la frecuencia de los precios, se investigó la forma de su distribución y se identificaron posibles sesgos en los datos (```base::skwness()``). Se calcularon métricas específicas para medir el sesgo y la kurtosis, lo que permitió comprender la distribución de las frecuencias y tomar decisiones analíticas adecuadas.
+
+Para evaluar las relaciones entre los atributos analizados se realizaron gráficas de dispersión entre los datos y se evaluaron correlaciones entre los datos de los atributos.
+
+
+Todos los análisis y limpieza de datos se realizaron con el lenguaje de programación R [@Rteam]. 
+
 
 # Resultados {.tabset}
 
 ## Análisis de Precios
 
-La distribución de los precios de la vivienda presenta un sesgo hacia valores muy altos (Figura \@ref(fig:figura2))
+### Precios totales de la vivienda
 
-```{r figura2, echo=FALSE, fig.align='center', fig.dpi=100, fig.id=TRUE}
+ El precio mínimo observado es de 58.0 millones de pesos, mientras que el precio máximo alcanza los 1999.0 millones de pesos. El primer cuartil indica un precio de 220.0 millones de pesos, y el tercer cuartil muestra un precio de 550.0 millones de pesos. La mediana, que divide al conjunto de datos en dos partes iguales, se sitúa en 330.0 millones de pesos, mientras que la media aritmética es de 435.1 millones de pesos (Tabla 1). 
+ 
+ **Tabla 1.** Estadisticos de los precios calculados. 
 
-library(paqueteMETODOS)
+| Estadística | Valor  |
+|:-:|:-:|
+| Min.        | 58.0   |
+| 1st Qu.     | 220.0  |
+| Mediana      | 330.0  |
+| Media        | 435.1  |
+| 3rd Qu.     | 550.0  |
+| Max.        | 1999.0 |
+| Simetría        | 1.84 |
 
-data("vivienda_faltantes")
 
+La distribución de los precios de la vivienda exhibe un sesgo positivo notable, con un valor de 1.84, indicando una inclinación hacia valores muy altos.  La curva de frecuencias es leptocurtica lo que significa hay una mayor concentración de datos en el centro y la presencia de valores atípicos o *outliers* (Figura 2).
+
+
+
+```{r figura2, echo=TRUE, fig.align='center', fig.dpi=100, fig.id=TRUE, message=FALSE}
+
+datos_join<-read.table("datos_imputados_Totales.csv", sep=",", header = TRUE)
 mxLo<-matrix(c(1,2), nrow=2, ncol=1, byrow=TRUE)
 nf<-layout(mat=mxLo, widths = c(3,3), heights = c(1,3), respect=TRUE)
 par(mar=c(0,3,1,1))
-boxplot(vivienda_faltantes$preciom,horizontal=TRUE, axes=FALSE, frame.plot=FALSE, col='white', border = '#367BB5', main=NULL)
+boxplot(datos_join$Precio,horizontal=TRUE, axes=FALSE, frame.plot=FALSE, col='white', border = '#367BB5', main=NULL)
 par(mar=c(4,4,2,2))
-hist(vivienda_faltantes$preciom , breaks = 30, col = '#367BB5', border = 'white', ylab="Frecuencia",xlab="Precios (millones)", main=NULL)
+hist(datos_join$Precio, breaks = 30, col = '#367BB5', border = 'white', ylab="Frecuencia",xlab="Precios (millones)", main=NULL)
+
 
 
 ```
 
-```{r Zonas, echo=FALSE, fig.align='center', fig.width=4, fig.height=8, fig.dpi=100, fig.id=TRUE}
+**Figura 2.** Histograma de frecuencias de los precios de las viviendas en el sector urbano de Cali.
+
+### Precios por zonas
+
+Se observa una variación  en los precios entre las zonas, con la Zona Centro teniendo el precio máximo más alto de 1999.0 millones de pesos y la Zona Norte con el precio mínimo más bajo de 58.0 millones de pesos. Además, se destacan diferencias en la distribución de los precios entre las zonas, reflejadas en medidas como la mediana y el tercer cuartil. 
+
+**Tabla 2.** Estadísticos de los datos de precio de las viviendas de Cali por zona de la ciudad.
+
+| Zona         | Min. | 1st Qu. | mediana | media | 3rd Qu. | Max.  | Simetría |
+|--------------|------|---------|--------|------|---------|-------|----------|
+| Zona Centro  | 100.0| 218.8   | 325.0  | 377.1| 442.5   | 1999.0| 2.667146 |
+| Zona Norte   | 58.0 | 119.0   | 158.0  | 194.9| 240.0   | 1100.0| 2.112688 |
+| Zona Oriente | 62.0 | 140.0   | 240.0  | 243.9| 335.0   | 800.0 | 0.8081782|
+| Zona Oeste   | 85.0 | 280.0   | 420.0  | 531.3| 680.0   | 1950.0| 1.39991  |
+| Zona Sur     | 75.0 | 230.0   | 335.0  | 440.8| 550.0   | 1900.0| 1.902482 |
+
+
+Por otro lado, la simetría de los precios varía entre las zonas, siendo más pronunciada en la Zona Centro y la Zona Norte, con valores de 2.667146 y 2.112688 respectivamente, mientras que la Zona Oriente exhibe la menor simetría con 0.8081782. Estos datos proporcionan una visión general de la estructura y características de los precios de viviendas en diferentes zonas de Cali (Figura 3).
+
+
+```{r Zonas, echo=TRUE, fig.align='center', fig.width=4, fig.height=8, fig.dpi=100, fig.id=TRUE, message=FALSE}
 require(ggplot2)
-require(paqueteMETODOS)
+datos_join<-read.table("datos_imputados_Totales.csv", sep=",", header = TRUE)
 
-data("vivienda_faltantes")
 
-ggplot(na.omit(vivienda_faltantes), aes(x = preciom))+
+
+ggplot(na.omit(datos_join), aes(x = Precio))+
   geom_histogram(binwidth = 50,color= "white", fill = "#367BB5")+
-   facet_wrap(~zona, ncol = 1, scales = "free")+
+   facet_wrap(~Zonas_IDE, ncol = 1, scales = "free")+
   labs(title = "Histograma de precio por zona")+
   theme_classic()+
   ylab("Frecuencia")+
@@ -146,114 +170,754 @@ ggplot(na.omit(vivienda_faltantes), aes(x = preciom))+
 
 
 ```
+**Figura 3.** Histograma de frecuencias de los precios de las viviendas en las diferentes zonas de Cali.
+
+El mapa de las zonas con respecto a los precios (Figura 4) muestra que la zona oeste tiene el mayor precio dado por la mediana, seguida por la zona sur y la zona centro con 335.0 y 325.0 respectivamente (Tabla 2). Sin embargo, la zona oeste tiene la mayor variabilidad en precios medida por el rango intercuartílico de 450 millones, seguido por la zona sur con un RIQ de 320 (Figura 4). 
 
 
+```{r mapaZonas, fig.align='center', echo=TRUE, message=TRUE, console=FALSE}
 
-```{r Mapa_Precios,  fig.align='center',echo=FALSE, message=FALSE, console=FALSE}
-require(leaflet)
-require(leaflet.extras)
-require(dplyr)
 require(sf)
-
-Barrios<-sf::read_sf("./sig/Cali_WGS84.gpkg", layer='Barrios_Precio_Total')
-
+zonas_precio_join<-sf::read_sf("./sig/Cali_WGS84.gpkg",   layer='Zonas_Precio_Total')
 
 
-
-barriosPaleta <- colorNumeric(
+ZonaPaleta <- colorNumeric(
   palette = "YlOrRd",
-  domain = na.omit(Barrios$mediana))
-barriosPaletaIQR<- colorNumeric(
-  palette = "PuBuGn",
-  domain = na.omit(Barrios$IQR))
+  domain = na.omit(zonas_precio_join$mediana))
 
-labelsMediana <- sprintf(
-  "<strong>%s</strong><br/>%g",
-  Barrios$barrio , Barrios$mediana
+ZonaPaletaIQR<- colorNumeric(
+  palette = "PuBuGn",
+  domain = na.omit(zonas_precio_join$IQR))
+
+ZonalabelsMediana <- sprintf(
+  "<strong></strong><strong>%s</strong><br/>%g millones",
+  zonas_precio_join$Zonas_IDE , zonas_precio_join$mediana
 ) %>% lapply(htmltools::HTML)
 
-labelsIQR <- sprintf(
-  "<strong>%s</strong><br/>%g",
-  Barrios$barrio , Barrios$IQR
+ZonalabelsIQR <- sprintf(
+  "<strong></strong><strong>%s</strong><br/>%g millones",
+  zonas_precio_join$Zonas_IDE , zonas_precio_join$IQR
 ) %>% lapply(htmltools::HTML)
 
 
 leaflet::leaflet(height=700, width = 800)%>%
   addProviderTiles(providers$CartoDB.DarkMatterNoLabels)%>%
-  addPolygons(data = Barrios, 
-              fillColor =  ~barriosPaletaIQR(IQR),  weight = 2,
+  addPolygons(data = zonas_precio_join, 
+              fillColor =  ~ZonaPaletaIQR(IQR),  weight = 2,
               opacity = 1,
               color = "grey",
               dashArray = "3",
-              group = "IQR",
+              group = "Zona - RIQ",
               fillOpacity = 1,
               highlightOptions = highlightOptions(
                 weight = 5,
                 color = "#666",
                 dashArray = "",
                 bringToFront = TRUE),
-              label = labelsIQR,
+              label = ZonalabelsIQR,
               labelOptions = labelOptions(
                 style = list("font-weight" = "normal", padding = "3px 8px"),
                 textsize = "15px",
                 direction = "auto"))%>%
-  addLegend( position = "bottomleft", pal = barriosPaletaIQR, values = na.omit(Barrios$IQR),
-             title = 'IQR Precios',
-             opacity = 1)%>%
-  addPolygons(data = Barrios, 
-              fillColor =  ~barriosPaleta(mediana),  weight = 2,
+  addPolygons(data = zonas_precio_join, 
+              fillColor =  ~ZonaPaleta(mediana),  weight = 2,
               opacity = 1,
               color = "grey",
               dashArray = "3",
-              group = "Mediana",
+              group = "Zona - Mediana",
               fillOpacity = 1,
               highlightOptions = highlightOptions(
                 weight = 5,
                 color = "#666",
                 dashArray = "",
-               bringToFront = TRUE),
-              label = labelsMediana,
+                bringToFront = TRUE),
+              label = ZonalabelsMediana,
+              labelOptions = labelOptions(
+                style = list("font-weight" = "normal", padding = "3px 8px"),
+                textsize = "15px",
+                direction = "auto"))%>%
+  
+  addLegend( position = "bottomleft", pal = ZonaPaletaIQR, values = na.omit(zonas_precio_join$IQR),
+             title = 'RIQ Precios',
+             opacity = 1)%>%
+  
+  addLegend( position = "bottomleft", pal = ZonaPaleta, values = na.omit(zonas_precio_join$mediana),
+             title = 'Mediana Precios',
+             opacity = 1)%>%
+  addFullscreenControl(position = "topleft", pseudoFullscreen = TRUE)%>%
+  addLayersControl(overlayGroups = c("Zona - Mediana", "Zona - RIQ"),    options = layersControlOptions(collapsed = FALSE))%>%
+  addMiniMap(tiles = "CartoDB.Voyager")
+
+
+```
+
+**Figura 4.** Mapa de la mediana y el rango intercuartílico (RIQ) de los precios de las viviendas por zonas de Cali.
+
+La correlación entre el precio por zona medido por la mediana y la variabilidad medida por el RIQ presentó una correlación muy fuerte ($spearman_{cor}=1$) (Figura 5).
+
+```{r plotzonas, fig.align='center', echo=TRUE, message=TRUE, console=FALSE}
+zonas_precio_join<-sf::read_sf("./sig/Cali_WGS84.gpkg",   layer='Zonas_Precio_Total')
+
+plot(zonas_precio_join$mediana, zonas_precio_join$IQR, 
+     main = "Relación entre el precio y la variabilidad de precios", 
+     xlab = "Mediana de precios por zonas", 
+     ylab = "RIQ de precio por zonas", 
+     pch = 19, 
+     col = "#367BB5", # Color de los puntos
+     bg = "#FFFFFF")
+```
+**Figura 5.** gráfico de dispersión de la mediana  y el rango intercuartílico de precios de las viviendas en Cali.
+
+Al examinar las comunas, se destaca que la comuna 22 sobresale por sus altos precios, con una mediana de 690 millones, seguida por la comuna 1 con una mediana de 687.5 millones. Por otro lado, el precio más bajo se observa en la comuna 13 con un precio de mediana de 100 millones.
+
+```{r mapaBComuna, fig.align='center', echo=TRUE, message=TRUE, console=FALSE}
+
+require(sf)
+comuna_precio_join<-sf::read_sf("./sig/Cali_WGS84.gpkg",   layer='Comuna_Precio_Total')
+
+ComunaPaleta <- colorNumeric(
+  palette = "YlOrRd",
+  domain = na.omit(comuna_precio_join$mediana))
+
+ComunaPaletaIQR<- colorNumeric(
+  palette = "PuBuGn",
+  domain = na.omit(comuna_precio_join$IQR))
+
+ComunalabelsMediana <- sprintf(
+  "<strong>Comuna </strong><strong>%s</strong><br/>%g millones",
+  comuna_precio_join$comuna , comuna_precio_join$mediana
+) %>% lapply(htmltools::HTML)
+
+ComunalabelsIQR <- sprintf(
+  "<strong>Comuna </strong><strong>%s</strong><br/>%g millones",
+  comuna_precio_join$comuna , comuna_precio_join$IQR
+) %>% lapply(htmltools::HTML)
+
+
+leaflet::leaflet(height=700, width = 800)%>%
+  addProviderTiles(providers$CartoDB.DarkMatterNoLabels)%>%
+    addPolygons(data = comuna_precio_join, 
+              fillColor =  ~ComunaPaletaIQR(IQR),  weight = 2,
+              opacity = 1,
+              color = "grey",
+              dashArray = "3",
+              group = "Comuna - RIQ",
+              fillOpacity = 1,
+              highlightOptions = highlightOptions(
+                weight = 5,
+                color = "#666",
+                dashArray = "",
+                bringToFront = TRUE),
+              label = ComunalabelsIQR,
+              labelOptions = labelOptions(
+                style = list("font-weight" = "normal", padding = "3px 8px"),
+                textsize = "15px",
+                direction = "auto"))%>%
+    addPolygons(data = comuna_precio_join, 
+              fillColor =  ~ComunaPaleta(mediana),  weight = 2,
+              opacity = 1,
+              color = "grey",
+              dashArray = "3",
+              group = "Comuna - Mediana",
+              fillOpacity = 1,
+              highlightOptions = highlightOptions(
+                weight = 5,
+                color = "#666",
+                dashArray = "",
+                bringToFront = TRUE),
+              label = ComunalabelsMediana,
+              labelOptions = labelOptions(
+                style = list("font-weight" = "normal", padding = "3px 8px"),
+                textsize = "15px",
+                direction = "auto"))%>%
+ 
+  addLegend( position = "bottomleft", pal = ComunaPaletaIQR, values = na.omit(comuna_precio_join$IQR),
+             title = 'RIQ Precios',
+             opacity = 1)%>%
+  
+  addLegend( position = "bottomleft", pal = ComunaPaleta, values = na.omit(comuna_precio_join$mediana),
+             title = 'Mediana Precios',
+             opacity = 1)%>%
+  addFullscreenControl(position = "topleft", pseudoFullscreen = TRUE)%>%
+  addLayersControl(overlayGroups = c("Comuna - Mediana", "Comuna - RIQ"),    options = layersControlOptions(collapsed = FALSE))%>%
+  addMiniMap(tiles = "CartoDB.Voyager")
+
+```
+**Figura 6.** Mapa de la mediana y el rango intercuartílico (RIQ) de los precios de las viviendas por comunas de Cali.
+
+La correlación entre el precio por comuna medido por la mediana y la variabilidad medida por el RIQ presentó una correlación muy fuerte ($spearman_{cor}=0.84$) (Figura 5).
+
+```{r correlacioncomuna, fig.align='center', echo=TRUE, message=TRUE, console=FALSE}
+comuna_precio_join<-sf::read_sf("./sig/Cali_WGS84.gpkg",   layer='Comuna_Precio_Total')
+plot(comuna_precio_join$mediana, comuna_precio_join$IQR, 
+     main = "Relación entre el precio y la variabilidad de precios", 
+     xlab = "Mediana de precios por comunas", 
+     ylab = "RIQ de precio por comunas", 
+     pch = 19, 
+     col = "#367BB5", # Color de los puntos
+     bg = "#FFFFFF")
+```
+
+**Figura 7.** gráfico de dispersión de la mediana  y el rango intercuartílico de precios de las viviendas por comuna en Cali.
+
+Los precios más altos se presentaron en los barrios: Ciudadela Pasoancho, Santa Rita y Parcelaciones Pance, con precios de mediana por encima de los 800 millones. La mayor variabilidad de precios se presentó en el barrio Santa Rita seguido del barrio Aguacatal (Figura 8).
+
+
+```{r mapaBarrios, fig.align='center', echo=TRUE, message=TRUE, console=FALSE}
+
+require(sf)
+Barrios_precio_join<-sf::read_sf("./sig/Barrios_Precio_Total.gpkg",   layer='Barrios_Precio_Total')
+
+barriosPaleta <- colorNumeric(
+  palette = "YlOrRd",
+  domain = na.omit(Barrios_precio_join$mediana))
+
+barriosPaletaIQR<- colorNumeric(
+  palette = "PuBuGn",
+  domain = na.omit(Barrios_precio_join$IQR))
+
+BarrioslabelsMediana <- sprintf(
+  "<strong>%s</strong><br/>%g millones",
+  Barrios_precio_join$barrio , Barrios_precio_join$mediana
+) %>% lapply(htmltools::HTML)
+
+BarrioslabelsIQR <- sprintf(
+  "<strong>%s</strong><br/>%g millones",
+  Barrios_precio_join$barrio , Barrios_precio_join$IQR
+) %>% lapply(htmltools::HTML)
+
+
+leaflet::leaflet(height=700, width = 800)%>%
+  addProviderTiles(providers$CartoDB.DarkMatterNoLabels)%>%
+  addPolygons(data = Barrios_precio_join, 
+              fillColor =  ~barriosPaletaIQR(IQR),  weight = 2,
+              opacity = 1,
+              color = "grey",
+              dashArray = "3",
+              group = "Barrio - RIQ",
+              fillOpacity = 1,
+              highlightOptions = highlightOptions(
+                weight = 5,
+                color = "#666",
+                dashArray = "",
+                bringToFront = TRUE),
+              label = BarrioslabelsIQR,
+              labelOptions = labelOptions(
+                style = list("font-weight" = "normal", padding = "3px 8px"),
+                textsize = "15px",
+                direction = "auto"))%>%
+
+  addPolygons(data = Barrios_precio_join, 
+              fillColor =  ~barriosPaleta(mediana),  weight = 2,
+              opacity = 1,
+              color = "grey",
+              dashArray = "3",
+              group = "Barrio - Mediana",
+              fillOpacity = 1,
+              highlightOptions = highlightOptions(
+                weight = 5,
+                color = "#666",
+                dashArray = "",
+                bringToFront = TRUE),
+              label = BarrioslabelsMediana,
               labelOptions = labelOptions(
                 style = list("font-weight" = "normal", padding = "3px 8px"),
                 textsize = "15px",
                 direction = "auto"))%>%
   
   addFullscreenControl(position = "topleft", pseudoFullscreen = TRUE)%>%
-  addLegend( position = "bottomleft", pal = barriosPaleta, values = na.omit(Barrios$mediana),
+  addLegend( position = "bottomleft", pal = barriosPaletaIQR, values = na.omit(Barrios_precio_join$IQR),
+             title = 'RIQ Precios',
+             opacity = 1)%>%
+  addLegend( position = "bottomleft", pal = barriosPaleta, values = na.omit(Barrios_precio_join$mediana),
              title = 'Mediana Precios',
              opacity = 1)%>%
-
-  addLayersControl(overlayGroups = c("Mediana", "IQR"),    options = layersControlOptions(collapsed = FALSE))%>%
+    addLayersControl(overlayGroups = c("Barrio - Mediana", "Barrio - RIQ"),    options = layersControlOptions(collapsed = FALSE))%>%
   addMiniMap(tiles = "CartoDB.Voyager")
+
+```
+**Figura 8.** Mapa de la mediana y el rango intercuartílico (RIQ) de los precios de las viviendas por los barrios de Cali.
+
+La correlación entre el precio por barrios medido por la mediana y la variabilidad medida por el RIQ presentó una correlación positiva, pero no tan fuerte como las anteriores  ($spearman_{cor}=0.584$) (Figura 9).
+
+```{r correlacion, fig.align='center', echo=TRUE, message=TRUE, console=FALSE}
+Barrios_precio_join<-sf::read_sf("./sig/Cali_WGS84.gpkg",   layer='Barrios_Precio_Total')
+
+plot(Barrios_precio_join$mediana, Barrios_precio_join$IQR, 
+     main = "Relación entre el precio y la variabilidad de precios", 
+     xlab = "Mediana de precios por comunas", 
+     ylab = "RIQ de precio por comunas", 
+     pch = 19, 
+     col = "#367BB5", # Color de los puntos
+     bg = "#FFFFFF")
+
+```
+**Figura 9.** gráfico de dispersión de la mediana  y el rango intercuartílico de precios de las viviendas por barrio en Cali.
+
+## Tipos de viviendas ofertadas
+
+La simetría de los precios de los apartamentos, con un coeficiente de simetría de 2.159758, sugiere una distribución más sesgada hacia valores superiores (Tabla 3). Los precios varían desde un mínimo de 58 millones hasta un máximo de 1950 millones, con una mediana de 280 millones y una media de 368.3 millones (Tabla 3). En contraste, los precios de las casas muestran una mayor simetría, con un coeficiente de simetría de 1.56308. Los precios de las casas oscilan entre 80 y 1999 millones, con una mediana de 430 millones y una media de 543 millones. En general, los precios tienden a ser más altos para las casas en comparación con los apartamentos, como se refleja en sus medidas de tendencia central y dispersión (Tabla 3).
+
+**Tabla 3.** Estadísticos de los datos de precio de las tipos de de vivienda en Cali.
+
+| Tipo de propiedad  | Min. | 1st Qu. | Median | Mean | 3rd Qu. | Max.  |Simetría|
+|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+| Apartamento|  58.0 | 175.0   | 280.0  | 368.3| 430.0   | 1950.0|2.159758  |      
+| Casa       | 80   | 300     | 430    | 543  | 680     | 1999  |1.56308 |        
+
+
+```{r boxplottipos, fig.align='center', echo=TRUE, message=TRUE, console=FALSE}
+datos_imputados_Totales<-read.table("datos_imputados_Totales.csv", sep=",", header = TRUE)
+boxplot(Precio ~ Tipo.Vivienda, data = datos_imputados_Totales,
+        main = "Distribución de precios por tipos de vivienda",
+        xlab = "Zona",
+        ylab = "Número de datos",
+        col = "#367BB5", # Color de los puntos
+        bg = "#FFFFFF")
+
+```
+**Figura 10.** Diagrama de cajas de los precios de los tipos de vivienda en Cali.
+
+### Análisis zonal 
+
+#### Casas
+
+Las casas en la Zona Oeste, presentaron una mediana de los precios de 390 millones, con un RIQ de 430 millones, lo que sugiere una dispersión amplia de los precios en esta área. En contraste, la Zona Centro muestra una mediana ligeramente más baja de 317.5 millones, con un RIQ de 245 millones, indicando una dispersión de precios amplia en comparación con otras zonas (Figura 11 y Figura 12).
+
+La Zona Norte exhibe una mediana de precios de 118 millones, con un RIQ de 37 millones, lo que sugiere una tendencia de precios inferior y más estable con respecto a otras zonas.  De manera similar, la Zona Oriente muestra una mediana de 110 millones y un RIQ de 89 millones, lo que confirma una tendencia hacia precios más bajos y más estables en esta área (Figura 11 y Figura 12).
+
+Por último, la Zona Sur presenta una mediana de 260 millones y un RIQ de 185 millones, indicando un comportamiento de precios más elevados y menos estables en comparación con las zonas Norte y Oriente, pero con precios ligeramente inferiores al centro y con mayor distancia con el sur (Figura 11 y Figura 12).
+
+```{r boxplotcASAS, fig.align='center', echo=TRUE, message=TRUE, console=FALSE}
+datos_imputados_Totales<-read.table("datos_imputados_Totales.csv", sep=",", header = TRUE)
+casas<- datos_imputados_Totales %>% subset(Tipo.Vivienda == "Casa")
+
+
+
+boxplot(Precio ~ Zonas_IDE, data = casas,
+        main = "Distribución de los precios de las casas por zonas",
+        xlab = "Zona",
+        ylab = "Número de datos",
+        col = "#367BB5", # Color de los puntos
+        bg = "#FFFFFF")
+
 
 
 
 ```
 
-## Tipos de viviendas ofertadas
+**Figura 11.** Diagrama de cajas  de los precios de las casas por zonas en Cali.
 
-agfsfgfd
 
-## Características de las viviendas
+```{r casasZonas, fig.align='center', echo=TRUE, message=TRUE, console=FALSE}
+
+require(sf)
+require(leaflet)
+require(leaflet.extras)
+
+Casas_zonas_join<-sf::read_sf("./sig/Zonas_Precio_Total.gpkg",   layer='Casas_zonas_precio')
+
+barriosPaleta <- colorNumeric(
+  palette = "YlOrRd",
+  domain = na.omit(Casas_zonas_join$mediana))
+
+barriosPaletaIQR<- colorNumeric(
+  palette = "PuBuGn",
+  domain = na.omit(Casas_zonas_join$IQR))
+
+BarrioslabelsMediana <- sprintf(
+  "<strong>%s</strong><br/>%g millones",
+  Casas_zonas_join$Zonas_IDE , Casas_zonas_join$mediana
+) %>% lapply(htmltools::HTML)
+
+BarrioslabelsIQR <- sprintf(
+  "<strong>%s</strong><br/>%g millones",
+  Casas_zonas_join$Zonas_IDE , Casas_zonas_join$IQR
+) %>% lapply(htmltools::HTML)
+
+
+leaflet::leaflet(height=700, width = 800)%>%
+  addProviderTiles(providers$CartoDB.DarkMatterNoLabels)%>%
+  addPolygons(data = Casas_zonas_join, 
+              fillColor =  ~barriosPaletaIQR(IQR),  weight = 2,
+              opacity = 1,
+              color = "grey",
+              dashArray = "3",
+              group = "Zonas - RIQ",
+              fillOpacity = 1,
+              highlightOptions = highlightOptions(
+                weight = 5,
+                color = "#666",
+                dashArray = "",
+                bringToFront = TRUE),
+              label = BarrioslabelsIQR,
+              labelOptions = labelOptions(
+                style = list("font-weight" = "normal", padding = "3px 8px"),
+                textsize = "15px",
+                direction = "auto"))%>%
+
+  addPolygons(data = Casas_zonas_join, 
+              fillColor =  ~barriosPaleta(mediana),  weight = 2,
+              opacity = 1,
+              color = "grey",
+              dashArray = "3",
+              group = "Zonas - Mediana",
+              fillOpacity = 1,
+              highlightOptions = highlightOptions(
+                weight = 5,
+                color = "#666",
+                dashArray = "",
+                bringToFront = TRUE),
+              label = BarrioslabelsMediana,
+              labelOptions = labelOptions(
+                style = list("font-weight" = "normal", padding = "3px 8px"),
+                textsize = "15px",
+                direction = "auto"))%>%
+  
+  addFullscreenControl(position = "topleft", pseudoFullscreen = TRUE)%>%
+  addLegend( position = "bottomleft", pal = barriosPaletaIQR, values = na.omit(Casas_zonas_join$IQR),
+             title = 'RIQ Precios',
+             opacity = 1)%>%
+  addLegend( position = "bottomleft", pal = barriosPaleta, values = na.omit(Casas_zonas_join$mediana),
+             title = 'Mediana Precios',
+             opacity = 1)%>%
+    addLayersControl(overlayGroups = c("Zonas - Mediana", "Zonas - RIQ"),    options = layersControlOptions(collapsed = FALSE))%>%
+  addMiniMap(tiles = "CartoDB.Voyager")
+
+
+```
+
+**Figura 12.** Distribución de la mediana  y el RIQ de los precios de las casas en las diferentes zonas de Cali.
+
+#### Apartamentos
+
+En la Zona Oeste, la mediana de los precios de apartamentos fue de 391 millones de pesos, con un RIQ de 420 millones de pesos. Esto sugiere una variabilidad considerable en los precios dentro de esta área (Figura 13 y Figura 14).
+
+En contraste, la Zona Norte exhibe una mediana de 120 millones de pesos y un RIQ de 50.5 millones de pesos, lo que indica una concentración de precios en el extremo inferior de la distribución total de precios para los apartamentos (Figura 13 y Figura 14).
+
+Similarmente, en la Zona Oriente, la mediana es de 110 millones de pesos, con un RIQ de 75 millones de pesos, reflejando una distribución similar a la Zona Norte, pero con una dispersión ligeramente mayor (Figura 13 y Figura 14).
+
+Por otro lado, tanto la Zona Centro como la Zona Sur muestran medianas de precios relativamente altas, con valores de 310 y 260 millones de pesos respectivamente, y RIQ de 245 y 185 millones de pesos. Esto sugiere una variación más alta de precios en estas áreas en comparación con las zonas Norte y Oriente (Figura 13 y Figura 14).
+
+```{r boxplotaPTOS, fig.align='center', echo=TRUE, message=TRUE, console=FALSE}
+datos_imputados_Totales<-read.table("datos_imputados_Totales.csv", sep=",", header = TRUE)
+Apartamentos<- datos_imputados_Totales %>% subset(Tipo.Vivienda == "Apartamento")
+boxplot(Precio ~ Zonas_IDE, data = Apartamentos,
+        main = "Distribución de los precios de las apartamentos por zonas",
+        xlab = "Zona",
+        ylab = "Número de datos",
+        col = "#367BB5", # Color de los puntos
+        bg = "#FFFFFF")
+
+
+
+```
+**Figura 13.** Diagrama de cajas de los precios de los apartamentos por zonas en Cali.
+
+```{r apartamentosZonas, fig.align='center', echo=TRUE, message=TRUE, console=FALSE}
+
+require(sf)
+require(leaflet)
+require(leaflet.extras)
+
+Apartamentos_zonas_join<-sf::read_sf("./sig/Zonas_Precio_Total.gpkg",   layer='Apartamentos_zonas_precio')
+
+barriosPaleta <- colorNumeric(
+  palette = "YlOrRd",
+  domain = na.omit(Apartamentos_zonas_join$mediana))
+
+barriosPaletaIQR<- colorNumeric(
+  palette = "PuBuGn",
+  domain = na.omit(Apartamentos_zonas_join$IQR))
+
+BarrioslabelsMediana <- sprintf(
+  "<strong>%s</strong><br/>%g millones",
+  Apartamentos_zonas_join$Zonas_IDE , Apartamentos_zonas_join$mediana
+) %>% lapply(htmltools::HTML)
+
+BarrioslabelsIQR <- sprintf(
+  "<strong>%s</strong><br/>%g millones",
+  Apartamentos_zonas_join$Zonas_IDE , Apartamentos_zonas_join$IQR
+) %>% lapply(htmltools::HTML)
+
+
+leaflet::leaflet(height=700, width = 800)%>%
+  addProviderTiles(providers$CartoDB.DarkMatterNoLabels)%>%
+  addPolygons(data = Apartamentos_zonas_join, 
+              fillColor =  ~barriosPaletaIQR(IQR),  weight = 2,
+              opacity = 1,
+              color = "grey",
+              dashArray = "3",
+              group = "Zonas - RIQ",
+              fillOpacity = 1,
+              highlightOptions = highlightOptions(
+                weight = 5,
+                color = "#666",
+                dashArray = "",
+                bringToFront = TRUE),
+              label = BarrioslabelsIQR,
+              labelOptions = labelOptions(
+                style = list("font-weight" = "normal", padding = "3px 8px"),
+                textsize = "15px",
+                direction = "auto"))%>%
+
+  addPolygons(data = Apartamentos_zonas_join, 
+              fillColor =  ~barriosPaleta(mediana),  weight = 2,
+              opacity = 1,
+              color = "grey",
+              dashArray = "3",
+              group = "Zonas - Mediana",
+              fillOpacity = 1,
+              highlightOptions = highlightOptions(
+                weight = 5,
+                color = "#666",
+                dashArray = "",
+                bringToFront = TRUE),
+              label = BarrioslabelsMediana,
+              labelOptions = labelOptions(
+                style = list("font-weight" = "normal", padding = "3px 8px"),
+                textsize = "15px",
+                direction = "auto"))%>%
+  
+  addFullscreenControl(position = "topleft", pseudoFullscreen = TRUE)%>%
+  addLegend( position = "bottomleft", pal = barriosPaletaIQR, values = na.omit(Apartamentos_zonas_join$IQR),
+             title = 'RIQ Precios',
+             opacity = 1)%>%
+  addLegend( position = "bottomleft", pal = barriosPaleta, values = na.omit(Apartamentos_zonas_join$mediana),
+             title = 'Mediana Precios',
+             opacity = 1)%>%
+    addLayersControl(overlayGroups = c("Zonas - Mediana", "Zonas - RIQ"),    options = layersControlOptions(collapsed = FALSE))%>%
+  addMiniMap(tiles = "CartoDB.Voyager")
+
+
+```
+**Figura 14.** Distribución de la mediana y el RIQ de los precios de los apartamentos en las diferentes zonas de Cali.
+
+## Características de las viviendas ofertadas
+
+Dentro del conjunto de datos, se evaluaron seis categorías para las viviendas: el estrato al que pertenecía cada vivienda, el área construida en metros cuadrados de cada vivienda, el número de pisos para las casas y el piso en el que estaban ubicados los apartamentos, el número de parqueaderos, el número de baños y el número de habitaciones.
+
+Al observar los precios de las viviendas y su relación con el número de baños, se encontró que en general, para todos los estratos, había una tendencia a incrementar el precio con el incremento del número de baños (Figura 15). Este comportamiento fue muy similar entre las casas y los apartamentos; sin embargo, esta tendencia fue más marcada para los estratos 5 y 6 (Figura 15).
+
+```{r Figura_15, fig.align='center', echo=TRUE, message=TRUE, console=FALSE, fig.width=9}
+require(ggplot2)
+datos_imputados_Totales<-read.table("datos_imputados_Totales.csv", sep=",", header = TRUE)
+
+datos_imputados_Totales$No.Pisos<-as.factor(datos_imputados_Totales$No.Pisos)
+datos_imputados_Totales$Tipo.Vivienda<-as.factor(datos_imputados_Totales$Tipo.Vivienda)
+datos_imputados_Totales$Estrato<-as.factor(datos_imputados_Totales$Estrato)
+datos_imputados_Totales$No.Baños <-as.factor(datos_imputados_Totales$No.Baños)
+
+ggplot(datos_imputados_Totales, aes(x = No.Baños, y = Precio, fill = Tipo.Vivienda)) +
+  geom_boxplot() +
+  facet_wrap(~ Estrato, scales = "free") +
+  labs(title = "Precios de las Viviendas en Cada Estrato vs No. Baños",
+       x = "Número de Baños",
+       y = "Precio") +
+  scale_fill_manual(values = c("#d0d1e6", "#367BB5"))+
+  theme_bw()
+```
+
+**Figura 15.** Diagrama de cajas de los precios de las viviendas y su relación con el número de baños discriminados por estratos.
+
+En contraste con el número de baños, el precio de los tipos de vivienda no pareció estar influenciado por el número de pisos para las casas o en el piso que se ubique el apartamento (Figura 16). 
+
+```{r BoxplotFacetaspisos, fig.align='center', echo=TRUE, message=TRUE, console=FALSE, fig.width=9}
+require(ggplot2)
+datos_imputados_Totales<-read.table("datos_imputados_Totales.csv", sep=",", header = TRUE)
+
+datos_imputados_Totales$No.Pisos<-as.factor(datos_imputados_Totales$No.Pisos)
+datos_imputados_Totales$Tipo.Vivienda<-as.factor(datos_imputados_Totales$Tipo.Vivienda)
+datos_imputados_Totales$Estrato<-as.factor(datos_imputados_Totales$Estrato)
+datos_imputados_Totales$No.Baños <-as.factor(datos_imputados_Totales$No.Baños)
+
+ggplot(datos_imputados_Totales, aes(x = No.Pisos, y = Precio, fill = Tipo.Vivienda)) +
+  geom_boxplot() +
+  facet_wrap(~ Estrato, scales = "free") +
+  labs(title = "Precios de las Viviendas en Cada Estrato vs No. Pisos",
+       x = "Número de Pisos",
+       y = "Precio") +
+  scale_fill_manual(values = c("#d0d1e6", "#367BB5"))+
+  theme_bw()
+```
+
+
+**Figura 16.** Diagrama de cajas de los precios de las viviendas y su relación con el número de pisos discriminados por estratos.
+
+
+Para el número de parqueaderos, tampoco se observó una relación con el aumento del precio de la vivienda, ya sea casa o apartamento. Únicamente en el estrato seis se pudo observar una tendencia al aumento de precios con el incremento del número de parqueaderos, siendo esta tendencia más pronunciada en el caso de las casas (Figura 17).
+
+
+
+```{r BoxplotFacetasparqueaderos, fig.align='center', echo=TRUE, message=TRUE, console=FALSE, fig.width=9}
+require(ggplot2)
+datos_imputados_Totales<-read.table("datos_imputados_Totales.csv", sep=",", header = TRUE)
+
+datos_imputados_Totales$No.Pisos<-as.factor(datos_imputados_Totales$No.Pisos)
+datos_imputados_Totales$Tipo.Vivienda<-as.factor(datos_imputados_Totales$Tipo.Vivienda)
+datos_imputados_Totales$Estrato<-as.factor(datos_imputados_Totales$Estrato)
+datos_imputados_Totales$No.Baños <-as.factor(datos_imputados_Totales$No.Baños)
+datos_imputados_Totales$No.Parqueaderos <-as.factor(datos_imputados_Totales$No.Parqueaderos)
+
+ggplot(datos_imputados_Totales, aes(x = No.Parqueaderos, y = Precio, fill = Tipo.Vivienda)) +
+  geom_boxplot() +
+  facet_wrap(~ Estrato, scales = "free") +
+  labs(title = "Precios de las Viviendas en Cada Estrato vs No. Parqueaderos",
+       x = "Número de Parqueaderos",
+       y = "Precio") +
+  scale_fill_manual(values = c("#d0d1e6", "#367BB5"))+
+  theme_bw()
+```
+
+
+**Figura 17.** Diagrama de cajas de los precios de las viviendas y su relación con el número de parqueaderos discriminados por estratos.
+
+El comportamiento de la relación entre los precios y el número de habitaciones para todas las viviendas fue muy similar al observado en la relación entre el número de parqueaderos y el precio. Solo en los estratos 5 y 6 se observó una tendencia al aumento de los precios con el incremento en el número de habitaciones (Figura 18).
+
+```{r habitaciones, fig.align='center', echo=TRUE, message=TRUE, console=FALSE, fig.width=9}
+require(ggplot2)
+datos_imputados_Totales<-read.table("datos_imputados_Totales.csv", sep=",", header = TRUE)
+
+datos_imputados_Totales$No.Pisos<-as.factor(datos_imputados_Totales$No.Pisos)
+datos_imputados_Totales$Tipo.Vivienda<-as.factor(datos_imputados_Totales$Tipo.Vivienda)
+datos_imputados_Totales$Estrato<-as.factor(datos_imputados_Totales$Estrato)
+datos_imputados_Totales$No.Baños <-as.factor(datos_imputados_Totales$No.Baños)
+datos_imputados_Totales$No.Parqueaderos <-as.factor(datos_imputados_Totales$No.Parqueaderos)
+datos_imputados_Totales$No.Habitaciones <-as.factor(datos_imputados_Totales$No.Habitaciones)
+
+ggplot(datos_imputados_Totales, aes(x = No.Habitaciones, y = Precio, fill = Tipo.Vivienda)) +
+  geom_boxplot() +
+  facet_wrap(~ Estrato, scales = "free") +
+  labs(title = "Precios de las Viviendas en Cada Estrato vs No. Habitaciones",
+       x = "Número de Habitaciones",
+       y = "Precio") +
+  scale_fill_manual(values = c("#d0d1e6", "#367BB5"))+
+  theme_bw()
+```
+
+**Figura 18.** Diagrama de cajas de los precios de las viviendas y su relación con el número de habitaciones discriminados por estratos.
+
+El análisis gráfico reveló una clara tendencia de aumento en el precio con relación al incremento del tamaño de la vivienda, observándose dicho fenómeno tanto en las casas como en los apartamentos (Figura 19).
+
+Además, los resultados de la correlación de Spearman entre el precio y el área construida demostraron una correlación positiva significativa tanto para los apartamentos ($spearman_{cor}=0.89$) como para las casas ($spearman_{cor}=0.73$). Estos hallazgos indican que, de manera general, el crecimiento del área construida se asocia con un incremento en el precio de las propiedades. Sin embargo, se constató una correlación más notable en el caso de los apartamentos en comparación con las casas.
+
+```{r plotbox, fig.align='center', echo=TRUE, message=TRUE, console=FALSE, fig.width=9}
+require(ggplot2)
+datos_imputados_Totales<-read.table("datos_imputados_Totales.csv", sep=",", header = TRUE)
+colors <- c("#367BB5", 
+            "#d0d1e6") 
+
+plot( datos_imputados_Totales$Area_Construida,datos_imputados_Totales$Precio,
+       pch = 19,
+     col = colors[factor(datos_imputados_Totales$Tipo.Vivienda)],
+main = "Relación Precio con Área Construida por Tipo de Vivienda",
+xlab = "Área Construida",
+ylab = "Precio")
+
+legend("topleft",
+       legend = c("Apartamento", "Casa"),
+       pch = 19,
+       col = colors)
+```
+**Figura 19.** Gráfico de dispersión del área construida y su relación con el precio discriminado por e tipo de vivienda.
 
 
 # Discusión
 
+## Análisis de precios
+
+El presente estudio ofrece una minuciosa exploración sobre la distribución y características de los precios de las viviendas en Cali. Los resultados revelan una amplia gama de precios, que varían desde los 58.0 hasta los 1999.0 millones de pesos, con una media de 435.1 millones y una mediana de 330.0 millones de pesos. La distribución de los precios exhibe un sesgo positivo notable, indicativo de una tendencia hacia valores más altos, así como una curva de frecuencia leptocúrtica, sugiriendo una concentración significativa de datos en el centro con la presencia de valores atípicos.
+
+Se aprecia una variación sustancial en los precios entre las distintas zonas de la ciudad, siendo la Zona Centro la de mayor precio máximo y la Zona Norte la de precio mínimo más bajo. Además, se destacan discrepancias en la distribución de los precios entre las zonas, reflejadas en medidas como la mediana y el tercer cuartil.
+
+Al analizar las comunas y los barrios, se evidencia una notable diversidad en los precios, con la Comuna 22, la Comuna 1 y los barrios Ciudadela Pasoancho, Santa Rita y Parcelaciones Pance destacando por sus precios más altos. Además, se encontró una correlación muy fuerte entre el precio por comuna y la variabilidad medida por el rango intercuartil, lo que sugiere una relación significativa entre el nivel de precios y la variabilidad de precios en diferentes áreas de la ciudad.
+
+A partir de estos resultados, se puede inferir que aproximadamente la mitad del mercado inmobiliario en Cali está representado por viviendas con precios inferiores a 330 millones de pesos, y solo un 25% supera el valor de 540 millones de pesos. El 10% más alto de las viviendas en Cali superan los 870 millones de pesos. Al analizar por zonas, se puede interpretar que el 50% del mercado en la Zona Oeste se encuentra por debajo de los 420 millones de pesos, y el 75% del mercado es inferior a los 680 millones de pesos, mientras que en la Zona Norte el 75% del mercado inmobiliario no supera los 240 millones de pesos.
+
+
+
+## Tipos de viviendas ofertadas
+
+Analizando los tipos de vivienda que se ofertan en la ciudad de Cali, el mercado inmobiliario para los apartamentos se compone de un 50% de ofertas inferiores a los 280 millones de pesos y para las casas este mercado se caracteriza por ser un poco más favorable en precio con un 50% del mercado con valores inferiores a 430 millones de pesos. Solo un 25% del total de la oferta de apartamentos supera los 430 millones de pesos y para las casas solo el 25% de las ofertas supera los 680 millones de pesos. Al analizar los valores más altos se pudo observar que las casas que superan los 1000 millones de pesos son el 10% del mercado y los apartamentos que superan este valor representan solo el 4% del mercado. 
+
+Las áreas de mayor valor para las casas se ubican en la zona oeste y sur de la ciudad, aunque estas zonas exhiben una variabilidad considerable en los precios en comparación con otras partes del centro urbano de Cali. Por otro lado, en el caso de los apartamentos, los precios más elevados se encuentran principalmente en la zona oeste, el centro y la zona sur.
+
+## Características de las viviendas ofertadas
+ 
+Algunas de las características de las viviendas del mercado inmobiliario de Cali presentaron relaciones con los precios de estas. Las carateríticas que estuvieron directamente relacionadas con el precio fueron el número de baños, el número de parqueaderos y el número de habitaciones, sobretodo en el estrato 5 y 6; sin embargo la caracteristica que condiciona más el mercado de la vivienda es el área construida y esta influye mucho más sobre el precio de los apartamentos.
+
 # Conclusiones
+
+  - El casco urbano de Cali tiene una distribución de precios muy sesgada a precios que superan los 1000 millones de pesos, pero el 75% del mercado está representado por viviendas que no superan precios de 550 millones de pesos.
+  - Solo una porción inferior al 10% del mercado inmobiliario en la ciudad de Cali supera los 1000 millones de pesos y este tipo de vivienda no corresponde necesariamente a las zonas más costosas de la ciudad.
+  - Las zonas con mayor valor de oferta inmobiliaria son la zona oeste y la zona sur, seguida de la zona centro.
+  - Las zonas con mayores valores presentan una alta variabilidad interna de precios de las viviendas en Cali.
+  - La comuna 22 dentro de la zona sur y la comuna 1 dentro de la zona oeste son las que más condicionan los precios de las viviendas en dichas zonas.
+  - El barrio *Ciudadela Pasoancho* es el barrio con mayor valor de precio de las viviendas y uno de los que presenta menor variabilidad entre los más costosos.
+  - Existen diferencias en la distribución espacial de precios entre los apartamentos y las casas en las zonas de Cali.
+  - Las características de las viviendas que más condicionan los precios son: el área construida, el número de baños, el número de habitaciones y el número de parqueaderos, pero esta última solo tiene efecto en los estratos 5 y 6.
+
 
 # Referencias
 
 ::: {#refs}
 :::
 
-# Anexos
+# Anexos{.tabset}
 
-## Revisión de los datos espaciales
+En esta sección se presentan los métodos que se utilizaron para limpiar el conjunto de datos proporcionado por B&C Inmobiliaria para realizar el análisis del mercado inmobiliario de Cali. todo el código está disponible en el repositorio de github: [https://github.com/ChrisBermudezR/MST_unidad01](https://github.com/ChrisBermudezR/MST_unidad01).
 
-Mapa de distribución de precios. Las coordenadas están mal asignadas.
+El diagrama de flujo de la limpieza de los datos se presenta a continuación:
+
+```{r diagrama, fig.align='center', fig.height=7, fig.width=4, echo=TRUE, message=FALSE}
+require(DiagrammeR)
+mermaid("
+graph TD
+    A[INICIO] --> B(DESCARGA DE DATOS)
+    B --> C(VERIFICACIÓN DE COORDENADAS)
+    C --> D(VERIFICACIÓN DE BARRIOS)
+    D --> E(VERIFICACIÓN DE ZONAS)
+    E --> F(REVISIÓN DE DATOS FALTANTES)
+    F --> G(IMPUTACIÓN DE DATOS)
+    G --> H(ENSAMBLE DE CONJUNTO DE DATOS LIMPIOS)
+    H --> I(ANÁLISIS FINAL)
+    I --> J[FIN]
+")
+```
+
+## Fuente de datos
+
+### Datos proporcionados
+
+Las fuentes de datos para este análisis provienen del paquete "paqueteMETODOS" del repositorio de *Github* <https://github.com/dgonxalex80/paqueteMODELOS>.
+
+Este conjunto de datos comprende 13 atributos y 8330 entradas, que caracterizan los precios, los tipos de vivienda, el número de habitaciones, el estrato, el número de parqueaderos, el número de baños y el área construida de lo disponible en el mercado inmobiliario de la ciudad de Cali.
+
+**Tabla 1 .** Conjunto de datos utilizado en este trabajo.
+
+```{r histgrama, echo=TRUE, message=FALSE, console=FALSE}
+library(paqueteMETODOS)
+library(reactable)
+
+data("vivienda_faltantes")
+
+reactable(vivienda_faltantes)
+```
 
 
-```{r mapa_precios_general, fig.align='center',echo=FALSE, message=FALSE, console=FALSE}
+
+### Datos externos
+
+Para la corroboración de la distribución espacial de los datos se utiluzó la capa geográfica de barrios y comunas  descargada de la [*Infraestructura de Datos Espaciales de Cali*](http://ws-idesc.cali.gov.co:80/geoserver/idesc/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=idesc:mc_barrios&maxFeatures=400&outputFormat=SHAPE-ZIP). En esta capa se representan los 336 barrios y las 22 comunas del casco urbano de Cali, sin embargo esta capa no tiene actualizados algunos barrios como por ejemplo "Bochalema", por lo tanto la capa fue manipulada para agregar este barrio en el programa Qgis.
+
+
+## Datos espaciales
+
+En la Figura 1A, se aprecia que algunos puntos dentro del conjunto de datos están ubicados en barrios que no concuerdan con su distribución espacial. Para abordar este inconveniente, se empleó la capa descargada de la IDE de Cali para establecer una vinculación entre los barrios presentes en el conjunto de datos y aquellos de la capa geográfica oficial.
+
+Durante esta primera aproximación, se notó que el número de barrios codificados como factores no coincidía con el número de barrios registrados en la IDE de Cali. En total, el conjunto de datos original incluía 436 barrios, cifra que excede la cantidad de barrios en Cali.
+
+```{r mapa_precios_general, fig.align='center',echo=TRUE, message=FALSE, console=FALSE}
 require(leaflet)
 require(leaflet.extras)
 require(sf)
@@ -265,13 +929,24 @@ Viviendas_Espacial <- sf::st_as_sf(datos_Vivienda_sin.na, coords = c("Longitud",
 crs <- sf::st_crs("+proj=longlat +datum=WGS84 +no_defs")
 Viviendas_Espacial <- sf::st_set_crs(Viviendas_Espacial, crs)
 joined_sf <- sf::st_join(Viviendas_Espacial,Cali_WGS84 , join = st_within)
+
 pal <- colorNumeric(
   palette = "YlOrRd",
   domain = na.omit(datos_Vivienda$Precio))
 
+preciosLabels <- sprintf(
+  "<strong></strong><strong>%s</strong><br/>%g millones",
+  joined_sf$Barrio , joined_sf$Precio
+) %>% lapply(htmltools::HTML)
+
 map<-leaflet::leaflet(height=700, width = 800)%>%
  addProviderTiles(providers$CartoDB.DarkMatterNoLabels)%>%
-  addCircles(data = joined_sf, color = ~pal(Precio),  radius = ~Precio/10)%>%
+  addCircles(data = joined_sf, color = ~pal(Precio),  radius = ~Precio/10,
+             label = preciosLabels,
+              labelOptions = labelOptions(
+                style = list("font-weight" = "normal", padding = "3px 8px"),
+                textsize = "15px",
+                direction = "auto"))%>%
   addFullscreenControl(position = "topleft", pseudoFullscreen = TRUE)%>%
   addLegend( position = "bottomleft", pal = pal, values = na.omit(datos_Vivienda$Precio),
             title = 'Precios',
@@ -279,27 +954,164 @@ map<-leaflet::leaflet(height=700, width = 800)%>%
    addMiniMap(tiles = "CartoDB.Voyager")
 map
 ```
+**Figura 1A.** Mapas de los puntos de ubicación de los datos de precios del conjunto de datos.
 
-## Corrección de los datos Espaciales
+### Corrección de los datos espaciales
 
-Filtrado de los datos por fuera del casco urbano
+Para corregir la localización de los datos se realizó con la recodificación de los datos utilizando el paquete "*dplyr*" [@dplyr] con el comando  ```dplyr::recode_factor()```.
 
-## Revisión de los datos faltantes
+## Datos faltantes
+
+La Figura 2A muestra que la mayoría de los atributos en el conjunto de datos presentan tres datos faltantes como el valor más común. Específicamente, se observa que el atributo del número de pisos cuenta con 2641 datos faltantes, seguido por el número de parqueaderos con 1606 ausencias. Es fundamental considerar estas frecuencias y el tipo de atributos al momento de imputar estos datos, los cuales serán utilizados en el análisis para abordar el objetivo tres de este informe.
+
 
 <div>
 <p style='text-align:center;'>
-<img src="MdPattern.png" width="900px">
+<img src="Datos_Originales_MdPattern.png" width="1200px">
 </p>
 </div>
 
+**Figura 2A.** Patrón de datos faltantes para el conjunto de datos original.
+
+Para preparar los datos para la imputación y debido al tipo de atributo, se crearon dos conjuntos de datos, uno para las casas y otro para los apartamentos.
+
 ### Datos Faltantes por casa
 
+Los datos de las casas se analizaron considerando las frecuencias tanto del número de pisos como del número de parqueaderos, con el fin de determinar la estrategia más adecuada para la imputación de los datos en estos atributos.
+
 #### Pisos
+
+El análisis se llevó a cabo considerando la frecuencia de los datos del número de pisos por estrato, con el objetivo de identificar el valor más recurrente y así imputar los datos faltantes basándose en estas frecuencias.
+
+Se observó que, para las casas en todos los estratos, el valor más frecuente fue el de tener dos pisos (Figura 3A).
+
+<div>
+<p style='text-align:center;'>
+<img src="Casa_Estrato_Pisos.png" width="900px">
+</p>
+</div>
+
+**Figura 3A.** Diagrama de barras que ilustra las frecuencias de los distintos números de pisos dentro de cada estrato en el conjunto de datos.
+
+
 #### Parqueaderos
+
+Se observó que, en los estratos 3 y 4, el número de parqueaderos más común fue uno, mientras que en los estratos 5 y 6, la frecuencia más alta corresponde a dos parqueaderos (Figura 4A).
+
+<div>
+<p style='text-align:center;'>
+<img src="Casa_Estrato_Parqueaderos.png" width="900px">
+</p>
+</div>
+
+**Figura 4A.** Diagrama de barras que ilustra las frecuencias de los distintos números de parqueaderos dentro de cada estrato en el conjunto de datos.
+
 
 ### Datos Faltantes por Apartamento
 
+Para los datos de los apartamentos, también se analizaron considerando las frecuencias tanto del número de pisos como del número de parqueaderos, con el fin de determinar la estrategia más adecuada para la imputación de los datos en estos atributos para esta categoría.
+
 #### Pisos
+
+El análisis se realizó teniendo en cuenta la frecuencia de los datos de la posición del piso del apartamento por estrato, con el propósito de identificar el valor más común y, posteriormente, imputar los datos faltantes basándose en estas frecuencias.
+
+Se observó que, para los apartamentos en los estratos 3 y 4 el piso más frecuente en el que están los apartamentos es el quinto piso y el los estratos 5 y 6 el piso más frecuente es el tercer piso (Figura 5A).
+
+<div>
+<p style='text-align:center;'>
+<img src="Apartamento_Estrato_Pisos.png" width="900px">
+</p>
+</div>
+
+**Figura 5A.** Diagrama de barras que ilustra las frecuencias de los distintos números de pisos dentro de cada estrato en el conjunto de datos.
+
 #### Parqueaderos
 
+Se observó que, para los apartamentos en los estratos 3, 4 y 5 el número más frecuente de parqueaderos es uno y el número más frecuente de parqueaderos en el estrato 6 es de dos (Figura 6A).
+
+<div>
+<p style='text-align:center;'>
+<img src="Apartamento_Estrato_Parqueaderos.png" width="900px">
+</p>
+</div>
+
+**Figura 6A.** Diagrama de barras que ilustra las frecuencias de los distintos números de parqueaderos dentro de cada estrato en el conjunto de datos.
+
 ## Imputación
+
+### Casas
+
+Los datos faltantes para las características de número de pisos y de parqueaderos en las casas (Figura 7A) suman 687 y 1202 respectivamente. Estas imputaciones se llevaron a cabo basándose en las frecuencias más altas de estos atributos, categorizándolos por estrato con el fin de aumentar la probabilidad de realizar una imputación coherente.
+
+<div>
+<p style='text-align:center;'>
+<img src="datos_Casa_MdPattern.png" width="900px">
+</p>
+</div>
+
+**Figura 7A.** Patrón de datos faltantes para las casas.
+
+El código utilizado para esta imputación fue el siguiente (Figura 8A):
+
+```{r Imputacion_Casas,  echo=TRUE, results=FALSE, message=FALSE, eval = FALSE}
+
+#Codigo para imputar por frecuencias 
+Casa_Estrato03_Imp$No.Parqueaderos[is.na(Casa_Estrato03_Imp$No.Parqueaderos)]<-1
+Casa_Estrato04_Imp$No.Parqueaderos[is.na(Casa_Estrato04_Imp$No.Parqueaderos)]<-1
+Casa_Estrato05_Imp$No.Parqueaderos[is.na(Casa_Estrato05_Imp$No.Parqueaderos)]<-2
+Casa_Estrato06_Imp$No.Parqueaderos[is.na(Casa_Estrato06_Imp$No.Parqueaderos)]<-2
+
+Casa_Estrato03_Imp$No.Pisos[is.na(Casa_Estrato03_Imp$No.Pisos)]<-2
+Casa_Estrato04_Imp$No.Pisos[is.na(Casa_Estrato04_Imp$No.Pisos)]<-2
+Casa_Estrato05_Imp$No.Pisos[is.na(Casa_Estrato05_Imp$No.Pisos)]<-2
+Casa_Estrato06_Imp$No.Pisos[is.na(Casa_Estrato06_Imp$No.Pisos)]<-2
+
+```
+
+<div>
+<p style='text-align:center;'>
+<img src="datos_Casa_Imputadas_MdPattern.png" width="900px">
+</p>
+</div>
+
+**Figura 8A.** Patrón final de datos imputados para las casas.
+
+
+### Apartamento
+
+Los datos faltantes para los atributos de los apartamentos como la ubicación del piso y el número de parqueaderos asignados son de 821 y 1342 respectivamente (Figura 9A). 
+
+<div>
+<p style='text-align:center;'>
+<img src="datos_Apartamento_MdPattern.png" width="900px">
+</p>
+</div>
+
+**Figura 9A.** Patrón de datos faltantes para las casas.
+
+
+
+El código utilizado para esta imputación fue el siguiente (Figura 10A):
+
+```{r Imputacion_Apartamentos,  echo=TRUE, results=FALSE, message=FALSE, eval = FALSE}
+#Codigo para imputar por frecuencias 
+Apartamento_Estrato03_Imp$No.Parqueaderos[is.na(Apartamento_Estrato03_Imp$No.Parqueaderos)]<-1
+Apartamento_Estrato04_Imp$No.Parqueaderos[is.na(Apartamento_Estrato04_Imp$No.Parqueaderos)]<-1
+Apartamento_Estrato05_Imp$No.Parqueaderos[is.na(Apartamento_Estrato05_Imp$No.Parqueaderos)]<-2
+Apartamento_Estrato06_Imp$No.Parqueaderos[is.na(Apartamento_Estrato06_Imp$No.Parqueaderos)]<-2
+
+Apartamento_Estrato03_Imp$No.Pisos[is.na(Apartamento_Estrato03_Imp$No.Pisos)]<-5
+Apartamento_Estrato04_Imp$No.Pisos[is.na(Apartamento_Estrato04_Imp$No.Pisos)]<-5
+Apartamento_Estrato05_Imp$No.Pisos[is.na(Apartamento_Estrato05_Imp$No.Pisos)]<-3
+Apartamento_Estrato06_Imp$No.Pisos[is.na(Apartamento_Estrato06_Imp$No.Pisos)]<-3
+```
+
+<div>
+<p style='text-align:center;'>
+<img src="datos_Apartamento_Imputadas_MdPattern.png" width="900px">
+</p>
+</div>
+
+**Figura 10A.** Patrón de datos faltantes para las casas.
+
+
